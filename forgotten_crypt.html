@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Forgotten Crypt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #0a0a0a;
+            --text-color: #00ff41;
+            --input-color: #ffffff;
+            --border-color: #333;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            line-height: 1.5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 95vh;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            display: flex;
+            flex-direction: column;
+            background-color: #000;
+        }
+
+        #game-output {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        #game-output p {
+            margin: 0 0 1em 0;
+            white-space: pre-wrap; /* Allows wrapping and respects newlines */
+        }
+        
+        .prompt {
+            color: #888;
+        }
+        
+        .player-input {
+            color: var(--input-color);
+        }
+
+        #input-form {
+            display: flex;
+            padding: 10px;
+        }
+
+        #command-line {
+            background: transparent;
+            border: none;
+            color: var(--input-color);
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            flex-grow: 1;
+            outline: none;
+        }
+        
+        #command-prompt {
+            margin-right: 10px;
+        }
+        
+        /* Custom scrollbar for a retro feel */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="game-output"></div>
+        <form id="input-form">
+            <span id="command-prompt">&gt;</span>
+            <input type="text" id="command-line" autocomplete="off" autofocus>
+        </form>
+    </div>
+
+    <script>
+        const gameOutput = document.getElementById('game-output');
+        const inputForm = document.getElementById('input-form');
+        const commandLine = document.getElementById('command-line');
+
+        // --- GAME DATA ---
+        const world = {
+            'start': {
+                name: 'Forest Clearing',
+                description: "You stand in a quiet clearing surrounded by ancient, moss-covered trees. A cool breeze rustles the leaves. To the NORTH, a dark cave entrance beckons. An old, overgrown path leads EAST.",
+                exits: { 'north': 'cave_entrance', 'east': 'path' },
+                items: [
+                    { id: 'lantern', name: 'an old brass lantern', description: 'It feels heavy and is coated in a thin layer of grime, but seems functional.' }
+                ]
+            },
+            'path': {
+                name: 'Overgrown Path',
+                description: "The path is barely visible, choked with weeds and thorny bushes. You see an old, dilapidated shack to the NORTH. The path continues EAST, while the clearing is to the WEST.",
+                exits: { 'north': 'shack', 'west': 'start', 'east': 'bridge' },
+                items: []
+            },
+            'shack': {
+                name: 'Dilapidated Shack',
+                description: "The inside of the shack is dusty and filled with cobwebs. A single wooden table stands in the center. Light streams through holes in the roof. The only exit is SOUTH.",
+                exits: { 'south': 'path' },
+                items: [
+                    { id: 'key', name: 'a rusty iron key', description: 'It is cold and heavy. It might unlock something important.' }
+                ]
+            },
+            'cave_entrance': {
+                name: 'Cave Entrance',
+                description: "You are at the mouth of a dark cave. A wave of cold, damp air flows out. It is pitch black inside. You can't see a thing.",
+                exits: { 'south': 'start' },
+                items: [],
+                properties: {
+                    isDark: true
+                }
+            },
+             'bridge': {
+                name: 'Broken Bridge',
+                description: "You arrive at a deep chasm. A rickety rope bridge, with many planks missing, sways precariously in the wind. It looks too dangerous to cross. The path leads back WEST.",
+                exits: { 'west': 'path' },
+                items: [
+                    { id: 'plank', name: 'a sturdy wooden plank', description: 'This looks like it could be used to repair something.' }
+                ]
+            },
+            'crypt': {
+                name: 'The Forgotten Crypt',
+                description: "Inside the cave is a small, stone crypt. In the center lies a large, sealed sarcophagus covered in ancient runes.",
+                exits: { 'south': 'cave_entrance' },
+                items: [],
+                properties: {
+                    isLocked: true,
+                    lockId: 'key'
+                }
+            }
+        };
+        
+        // --- PLAYER STATE ---
+        let player = {
+            currentRoom: 'start',
+            inventory: [],
+            isLanternLit: false
+        };
+
+        // --- GAME LOGIC ---
+
+        function renderOutput(text, type = 'prompt') {
+            const p = document.createElement('p');
+            p.textContent = text;
+            p.className = type;
+            gameOutput.appendChild(p);
+            gameOutput.scrollTop = gameOutput.scrollHeight;
+        }
+        
+        function showRoom() {
+            const room = world[player.currentRoom];
+            let roomDescription = `\n[ ${room.name} ]\n${room.description}`;
+            
+            // Handle dark rooms
+            if(room.properties?.isDark && !player.isLanternLit) {
+                renderOutput("\nIt's pitch black. You can't see anything. Maybe some light would help?");
+                return;
+            }
+
+            if (room.items.length > 0) {
+                roomDescription += "\n\nYou see: ";
+                roomDescription += room.items.map(item => item.name).join(', ') + '.';
+            }
+            renderOutput(roomDescription);
+        }
+
+        function processInput(input) {
+            const lowerInput = input.toLowerCase();
+            const parts = lowerInput.split(' ');
+            const command = parts[0];
+            const target = parts.slice(1).join(' ');
+
+            renderOutput(`> ${input}`, 'player-input');
+
+            switch(command) {
+                case 'go':
+                case 'move':
+                case 'n':
+                case 's':
+                case 'e':
+                case 'w':
+                case 'north':
+                case 'south':
+                case 'east':
+                case 'west':
+                    handleMove(command, target);
+                    break;
+                case 'look':
+                case 'l':
+                    showRoom();
+                    break;
+                case 'take':
+                case 'get':
+                case 'grab':
+                    handleTake(target);
+                    break;
+                case 'inventory':
+                case 'i':
+                    showInventory();
+                    break;
+                case 'drop':
+                    handleDrop(target);
+                    break;
+                case 'use':
+                    handleUse(target);
+                    break;
+                case 'help':
+                    showHelp();
+                    break;
+                default:
+                    renderOutput("I don't understand that command. Type 'help' for a list of commands.");
+            }
+        }
+
+        function handleMove(command, target) {
+            let direction = command;
+            if (['go', 'move'].includes(command)) {
+                direction = target;
+            }
+            
+            // map shortcuts
+            if (direction === 'n') direction = 'north';
+            if (direction === 's') direction = 'south';
+            if (direction === 'e') direction = 'east';
+            if (direction === 'w') direction = 'west';
+
+            const room = world[player.currentRoom];
+            if (room.exits[direction]) {
+                // Special case for entering the cave
+                if (room.exits[direction] === 'crypt' && world[player.currentRoom].properties?.isDark && !player.isLanternLit) {
+                    renderOutput("You stumble around in the darkness but can't find a way forward.");
+                    return;
+                }
+                player.currentRoom = room.exits[direction];
+                showRoom();
+            } else {
+                renderOutput("You can't go that way.");
+            }
+        }
+
+        function handleTake(target) {
+            const room = world[player.currentRoom];
+            const itemIndex = room.items.findIndex(item => item.name.includes(target));
+            
+            if (itemIndex > -1) {
+                const [item] = room.items.splice(itemIndex, 1);
+                player.inventory.push(item);
+                renderOutput(`You took the ${item.name.replace('a ', '').replace('an ', '')}.`);
+            } else {
+                renderOutput("You don't see that here.");
+            }
+        }
+        
+        function handleDrop(target) {
+            const itemIndex = player.inventory.findIndex(item => item.name.includes(target));
+
+            if (itemIndex > -1) {
+                const [item] = player.inventory.splice(itemIndex, 1);
+                world[player.currentRoom].items.push(item);
+                renderOutput(`You dropped the ${item.name.replace('a ', '').replace('an ', '')}.`);
+            } else {
+                renderOutput("You don't have that in your inventory.");
+            }
+        }
+        
+        function handleUse(target) {
+            const item = player.inventory.find(i => i.name.includes(target) || i.id === target);
+            const room = world[player.currentRoom];
+            
+            if (!item) {
+                renderOutput("You don't have that.");
+                return;
+            }
+
+            if (item.id === 'lantern') {
+                if (player.isLanternLit) {
+                    player.isLanternLit = false;
+                    renderOutput("You extinguish the lantern, plunging the area into darkness.");
+                } else {
+                    player.isLanternLit = true;
+                    renderOutput("You light the lantern. A warm, steady light fills the area.");
+                    if(room.properties?.isDark) {
+                        // Reveal the path forward
+                        room.description = "The lantern light cuts through the oppressive darkness, revealing a passage leading NORTH into the heart of the cave. The air is still and cold.";
+                        room.exits.north = 'crypt';
+                        showRoom();
+                    }
+                }
+            } else if (item.id === 'key' && room.name === 'The Forgotten Crypt') {
+                if(room.properties.isLocked) {
+                    room.properties.isLocked = false;
+                    renderOutput("You insert the rusty key into a hidden keyhole on the sarcophagus. With a loud *CLICK*, the lock disengages. The heavy stone lid slides open!");
+                    renderOutput("\nCongratulations! You have found the lost treasure of the ancient king. You win!");
+                    commandLine.disabled = true; // End game
+                } else {
+                    renderOutput("The sarcophagus is already unlocked.");
+                }
+            } else {
+                 renderOutput("You can't use that here.");
+            }
+        }
+
+        function showInventory() {
+            if (player.inventory.length === 0) {
+                renderOutput("Your inventory is empty.");
+            } else {
+                let invString = "You are carrying:\n";
+                player.inventory.forEach(item => {
+                    invString += `- ${item.name}\n`;
+                });
+                renderOutput(invString);
+            }
+        }
+        
+        function showHelp() {
+            renderOutput(`--- Common Commands ---
+- go [north/south/east/west] (or just n, s, e, w)
+- look (or l)
+- take [item name]
+- drop [item name]
+- use [item name]
+- inventory (or i)
+- help`);
+        }
+
+        // --- EVENT LISTENERS ---
+        inputForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const command = commandLine.value.trim();
+            if (command) {
+                processInput(command);
+            }
+            commandLine.value = '';
+        });
+
+        // --- START GAME ---
+        function startGame() {
+            renderOutput("Welcome to The Forgotten Crypt!");
+            showRoom();
+        }
+        
+        startGame();
+
+    </script>
+</body>
+</html>
+
