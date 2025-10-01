@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sea of Samsara</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #0c001f;
+            font-family: 'Times New Roman', Times, serif;
+            color: white;
+        }
+        canvas {
+            display: block;
+        }
+        #info-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            font-size: 16px;
+            pointer-events: none;
+            text-align: left;
+        }
+        #info-overlay div {
+            opacity: 0.8;
+        }
+        #controls-overlay {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #wisdom-quote {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 22px;
+            color: rgba(255, 255, 200, 0);
+            max-width: 600px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            transition: opacity 1.5s ease-in-out;
+            pointer-events: none;
+        }
+        #realm-name {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0);
+            text-shadow: 0 0 8px rgba(0,0,0,0.7);
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="info-overlay">
+        <div>Conditioned Existence (X): <span id="posX">0</span></div>
+        <div>Conditioned Existence (Y): <span id="posY">0</span></div>
+        <div>Karmic Momentum: <span id="velocity">0.0</span></div>
+    </div>
+    <div id="realm-name"></div>
+    <div id="wisdom-quote"></div>
+    <div id="controls-overlay">
+        [W] or [↑] for Intention | [A]/[D] or [←]/[→] to Direct | [SPACE] to Observe
+    </div>
+
+    <script>
+        // --- Setup ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const posXElem = document.getElementById('posX');
+        const posYElem = document.getElementById('posY');
+        const velocityElem = document.getElementById('velocity');
+        const wisdomQuoteElem = document.getElementById('wisdom-quote');
+        const realmNameElem = document.getElementById('realm-name');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // --- Game Constants ---
+        const VESSEL_SIZE = 15;
+        const INTENTION_FORCE = 0.04;
+        const TURN_SPEED = 0.06;
+        const BASE_FRICTION = 0.99;
+        const OBSERVING_FRICTION = 0.92; // Stronger friction when observing
+        const SECTOR_SIZE = 3000;
+        const PHENOMENA_DENSITY = 0.0004;
+        const REALM_CHANCE = 0.5;
+
+        // --- Vessel of Awareness ---
+        const vessel = {
+            x: 0, y: 0, vx: 0, vy: 0,
+            angle: -Math.PI / 2,
+            isThrusting: false,
+            isObserving: false,
+        };
+
+        // --- Input Handling ---
+        const keys = {
+            w: false, 'ArrowUp': false,
+            a: false, 'ArrowLeft': false,
+            d: false, 'ArrowRight': false,
+            ' ': false, // For spacebar
+        };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key in keys) keys[e.key] = true;
+            if (e.key === ' ') e.preventDefault();
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key in keys) keys[e.key] = false;
+        });
+
+        // --- Buddhist Teachings & Content ---
+        const WISDOM_QUOTES = [
+            "The root of suffering is attachment.",
+            "Three things cannot be long hidden: the sun, the moon, and the truth.",
+            "All that we are is the result of what we have thought.",
+            "Peace comes from within. Do not seek it without.",
+            "Just as a candle cannot burn without fire, men cannot live without a spiritual life.",
+            "To observe the arising and passing of all phenomena is to be free.",
+            "Nothing is permanent. Everything is subject to change.",
+            "The mind is everything. What you think you become.",
+            "Holding on to anger is like grasping a hot coal with the intent of throwing it at someone else; you are the one who gets burned.",
+        ];
+        let currentQuote = "";
+        let quoteTimer = 0;
+
+        const REALMS = [
+            { name: "Realm of Devas (Bliss)", color: "rgba(255, 223, 186, 0.15)" },
+            { name: "Realm of Asuras (Conflict)", color: "rgba(255, 69, 0, 0.15)" },
+            { name: "Realm of Humans (Opportunity)", color: "rgba(135, 206, 250, 0.15)" },
+            { name: "Realm of Animals (Instinct)", color: "rgba(34, 139, 34, 0.2)" },
+            { name: "Realm of Pretas (Craving)", color: "rgba(128, 128, 128, 0.2)" },
+            { name: "Realm of Naraka (Suffering)", color: "rgba(139, 0, 0, 0.25)" },
+        ];
+
+        // --- Procedural Generation ---
+        function mulberry32(seed) {
+            return function() {
+                let t = seed += 0x6D2B79F5;
+                t = Math.imul(t ^ t >>> 15, t | 1);
+                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            }
+        }
+
+        const universeCache = new Map();
+        function getSectorObjects(sectorX, sectorY) {
+            const key = `${sectorX},${sectorY}`;
+            if (universeCache.has(key)) return universeCache.get(key);
+
+            const seed = (sectorX * 38183) ^ (sectorY * 43111);
+            const random = mulberry32(seed);
+
+            const objects = { phenomena: [], realm: null };
+
+            const numPhenomena = Math.floor(SECTOR_SIZE * SECTOR_SIZE * PHENOMENA_DENSITY);
+            for (let i = 0; i < numPhenomena; i++) {
+                objects.phenomena.push({
+                    x: sectorX * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    y: sectorY * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    size: random() * 1.5 + 0.5,
+                    opacity: random() * 0.7 + 0.2,
+                });
+            }
+
+            if (random() < REALM_CHANCE) {
+                objects.realm = {
+                    x: sectorX * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    y: sectorY * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    radius: random() * 800 + 400,
+                    definition: REALMS[Math.floor(random() * REALMS.length)],
+                };
+            }
+            universeCache.set(key, objects);
+            if(universeCache.size > 200) universeCache.delete(universeCache.keys().next().value);
+            return objects;
+        }
+
+        // --- Update & Draw ---
+        function update() {
+            vessel.isThrusting = keys.w || keys.ArrowUp;
+            vessel.isObserving = keys[' '];
+
+            if (keys.a || keys.ArrowLeft) vessel.angle -= TURN_SPEED;
+            if (keys.d || keys.ArrowRight) vessel.angle += TURN_SPEED;
+
+            if (vessel.isThrusting && !vessel.isObserving) {
+                vessel.vx += Math.cos(vessel.angle) * INTENTION_FORCE;
+                vessel.vy += Math.sin(vessel.angle) * INTENTION_FORCE;
+            }
+
+            const friction = vessel.isObserving ? OBSERVING_FRICTION : BASE_FRICTION;
+            vessel.vx *= friction;
+            vessel.vy *= friction;
+            vessel.x += vessel.vx;
+            vessel.y += vessel.vy;
+
+            // Update UI
+            posXElem.textContent = vessel.x.toFixed(0);
+            posYElem.textContent = vessel.y.toFixed(0);
+            velocityElem.textContent = (Math.sqrt(vessel.vx**2 + vessel.vy**2) * 100).toFixed(1);
+            
+            // Handle wisdom quotes
+            if(vessel.isObserving) {
+                wisdomQuoteElem.style.opacity = '1';
+                if(quoteTimer <= 0) {
+                    currentQuote = WISDOM_QUOTES[Math.floor(Math.random() * WISDOM_QUOTES.length)];
+                    wisdomQuoteElem.textContent = currentQuote;
+                    quoteTimer = 300; // Show quote for 300 frames (~5 seconds)
+                }
+                quoteTimer--;
+            } else {
+                wisdomQuoteElem.style.opacity = '0';
+                quoteTimer = 0;
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0c001f';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(canvas.width / 2 - vessel.x, canvas.height / 2 - vessel.y);
+
+            const playerSectorX = Math.floor(vessel.x / SECTOR_SIZE);
+            const playerSectorY = Math.floor(vessel.y / SECTOR_SIZE);
+            let inRealm = null;
+
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const sector = getSectorObjects(playerSectorX + i, playerSectorY + j);
+
+                    if (sector.realm) {
+                        ctx.beginPath();
+                        ctx.arc(sector.realm.x, sector.realm.y, sector.realm.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = sector.realm.definition.color;
+                        ctx.fill();
+                        
+                        const dist = Math.hypot(vessel.x - sector.realm.x, vessel.y - sector.realm.y);
+                        if (dist < sector.realm.radius) {
+                            inRealm = sector.realm.definition;
+                        }
+                    }
+
+                    sector.phenomena.forEach(p => {
+                        ctx.fillStyle = `rgba(255, 255, 220, ${p.opacity * (vessel.isObserving ? 0.3 : 1)})`;
+                        ctx.fillRect(p.x, p.y, p.size, p.size);
+                    });
+                }
+            }
+            
+            // Update realm name display
+            if(inRealm) {
+                realmNameElem.textContent = inRealm.name;
+                realmNameElem.style.opacity = '1';
+            } else {
+                realmNameElem.style.opacity = '0';
+            }
+
+            ctx.restore();
+
+            // --- Draw Vessel of Awareness ---
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(vessel.angle + Math.PI / 2); // Adjust rotation for lotus shape
+
+            // Glowing aura when observing
+            if (vessel.isObserving) {
+                const grad = ctx.createRadialGradient(0, 0, VESSEL_SIZE * 0.5, 0, 0, VESSEL_SIZE * 2.5);
+                grad.addColorStop(0, 'rgba(255, 255, 220, 0.6)');
+                grad.addColorStop(1, 'rgba(255, 255, 220, 0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(-VESSEL_SIZE * 3, -VESSEL_SIZE * 3, VESSEL_SIZE * 6, VESSEL_SIZE * 6);
+            }
+            
+            // Simple lotus/orb shape
+            ctx.beginPath();
+            ctx.arc(0, 0, VESSEL_SIZE / 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
