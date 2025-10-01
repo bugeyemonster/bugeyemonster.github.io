@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Invaders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #333;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        canvas {
+            background-color: #0a0a0a;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4 / 3;
+        }
+
+        #ui-container {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            text-shadow: 0 0 5px #0f0;
+        }
+
+        #message-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.75);
+            padding: 30px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #f00;
+            color: #ff0;
+        }
+        
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        button {
+            background: #111;
+            border: 2px solid #333;
+            color: #fff;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 20px #0f0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="ui-container">
+            <span id="score">SCORE: 0000</span>
+            <span id="lives">LIVES: 3</span>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="message-screen">
+            <h1 id="message-title">PIXEL INVADERS</h1>
+            <p id="message-text">Use LEFT/RIGHT ARROWS to move.<br>Press SPACE to shoot.</p>
+            <button id="actionButton">Start Game</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const scoreEl = document.getElementById('score');
+        const livesEl = document.getElementById('lives');
+        const messageScreen = document.getElementById('message-screen');
+        const messageTitle = document.getElementById('message-title');
+        const messageText = document.getElementById('message-text');
+        const actionButton = document.getElementById('actionButton');
+
+        const GAME_WIDTH = 800;
+        const GAME_HEIGHT = 600;
+        canvas.width = GAME_WIDTH;
+        canvas.height = GAME_HEIGHT;
+
+        let score, lives, wave;
+        let player, invaders, bullets, invaderBullets, particles;
+        let keys = {};
+        let gameState = 'start'; // 'start', 'playing', 'gameover'
+        
+        class Player {
+            constructor() {
+                this.width = 50;
+                this.height = 30;
+                this.x = (GAME_WIDTH - this.width) / 2;
+                this.y = GAME_HEIGHT - this.height - 20;
+                this.speed = 7;
+                this.canShoot = true;
+                this.shootCooldown = 300; // ms
+            }
+
+            draw() {
+                ctx.fillStyle = '#0f0';
+                ctx.fillRect(this.x + 20, this.y, 10, 10);
+                ctx.fillRect(this.x, this.y + 10, 50, 20);
+            }
+
+            update() {
+                if (keys['ArrowLeft'] && this.x > 0) {
+                    this.x -= this.speed;
+                }
+                if (keys['ArrowRight'] && this.x < GAME_WIDTH - this.width) {
+                    this.x += this.speed;
+                }
+                if (keys['Space'] && this.canShoot) {
+                    this.shoot();
+                }
+                this.draw();
+            }
+
+            shoot() {
+                bullets.push(new Bullet(this.x + this.width / 2 - 2.5, this.y));
+                this.canShoot = false;
+                setTimeout(() => {
+                    this.canShoot = true;
+                }, this.shootCooldown);
+            }
+        }
+
+        class Bullet {
+            constructor(x, y, isInvader = false) {
+                this.x = x;
+                this.y = y;
+                this.width = 5;
+                this.height = 15;
+                this.speed = isInvader ? 6 : 8;
+                this.isInvader = isInvader;
+                this.color = isInvader ? '#ff3333' : '#0ff';
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+
+            update() {
+                this.y += this.isInvader ? this.speed : -this.speed;
+                this.draw();
+            }
+        }
+
+        class Invader {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 40;
+                this.height = 30;
+            }
+
+            draw() {
+                ctx.fillStyle = 'yellow';
+                // Simple pixel art for invader
+                ctx.fillRect(this.x + 10, this.y, 20, 10);
+                ctx.fillRect(this.x, this.y + 10, 40, 10);
+                ctx.fillRect(this.x + 5, this.y + 20, 10, 10);
+                ctx.fillRect(this.x + 25, this.y + 20, 10, 10);
+            }
+        }
+
+        class InvaderGrid {
+            constructor() {
+                this.x = 0;
+                this.y = 50;
+                this.invaders = [];
+                this.width = 0;
+                this.speed = 1 + wave * 0.2;
+                this.direction = 1; // 1 for right, -1 for left
+                this.shootChance = 0.005 + wave * 0.001;
+
+                const cols = 10;
+                const rows = 5;
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        this.invaders.push(new Invader(c * 60, r * 50));
+                    }
+                }
+                 this.width = cols * 60 - 20;
+            }
+
+            update() {
+                this.x += this.speed * this.direction;
+
+                let hitEdge = false;
+                if (this.x + this.width >= GAME_WIDTH || this.x <= 0) {
+                     this.direction *= -1;
+                     this.y += 30;
+                     hitEdge = true;
+                }
+
+                this.invaders.forEach(invader => {
+                    invader.x += this.speed * this.direction;
+                    if(hitEdge) invader.y += 30;
+                    invader.draw();
+
+                    if (Math.random() < this.shootChance) {
+                        invaderBullets.push(new Bullet(this.x + invader.x + invader.width / 2, this.y + invader.y, true));
+                    }
+
+                    // Check if invaders reached player
+                    if (this.y + invader.y + invader.height >= player.y) {
+                        endGame(false); // Lost game
+                    }
+                });
+            }
+        }
+
+        class Particle {
+             constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 5 + 2;
+                this.vel = {
+                    x: (Math.random() - 0.5) * 5,
+                    y: (Math.random() - 0.5) * 5
+                };
+                this.life = 30;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+
+            update() {
+                this.x += this.vel.x;
+                this.y += this.vel.y;
+                this.life--;
+                this.draw();
+            }
+        }
+        
+        function createExplosion(x, y, color) {
+             for (let i = 0; i < 15; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function init() {
+            score = 0;
+            lives = 3;
+            wave = 1;
+            player = new Player();
+            invaders = new InvaderGrid();
+            bullets = [];
+            invaderBullets = [];
+            particles = [];
+            updateUI();
+        }
+
+        function nextWave() {
+             wave++;
+             invaders = new InvaderGrid();
+             bullets = [];
+             invaderBullets = [];
+             player.x = (GAME_WIDTH - player.width) / 2;
+        }
+
+        function updateUI() {
+            scoreEl.textContent = `SCORE: ${score.toString().padStart(4, '0')}`;
+            livesEl.textContent = `LIVES: ${lives}`;
+        }
+        
+        function handleCollisions() {
+            // Player bullets hitting invaders
+            bullets.forEach((bullet, bIndex) => {
+                invaders.invaders.forEach((invader, iIndex) => {
+                     const invaderX = invaders.x + invader.x;
+                     const invaderY = invaders.y + invader.y;
+                    if (
+                        bullet.x < invaderX + invader.width &&
+                        bullet.x + bullet.width > invaderX &&
+                        bullet.y < invaderY + invader.height &&
+                        bullet.y + bullet.height > invaderY
+                    ) {
+                        createExplosion(bullet.x, bullet.y, 'yellow');
+                        bullets.splice(bIndex, 1);
+                        invaders.invaders.splice(iIndex, 1);
+                        score += 10;
+                        updateUI();
+                    }
+                });
+            });
+
+            // Invader bullets hitting player
+            invaderBullets.forEach((bullet, bIndex) => {
+                 if (
+                    bullet.x < player.x + player.width &&
+                    bullet.x + bullet.width > player.x &&
+                    bullet.y < player.y + player.height &&
+                    bullet.y + bullet.height > player.y
+                ) {
+                    createExplosion(player.x + player.width / 2, player.y + player.height / 2, '#0f0');
+                    invaderBullets.splice(bIndex, 1);
+                    lives--;
+                    updateUI();
+                    if (lives <= 0) {
+                        endGame(false);
+                    }
+                }
+            });
+        }
+        
+        function startGame() {
+            gameState = 'playing';
+            messageScreen.style.display = 'none';
+            init();
+            gameLoop();
+        }
+
+        function endGame(playerWon) {
+            gameState = 'gameover';
+            messageScreen.style.display = 'block';
+            if(playerWon) {
+                messageTitle.textContent = "YOU WIN!";
+                messageText.textContent = `Final Score: ${score}`;
+            } else {
+                messageTitle.textContent = "GAME OVER";
+                messageText.textContent = `You reached wave ${wave}. Final Score: ${score}`;
+            }
+            actionButton.textContent = 'Restart Game';
+        }
+
+        function gameLoop() {
+            if (gameState !== 'playing') return;
+
+            requestAnimationFrame(gameLoop);
+            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            player.update();
+            invaders.update();
+            
+            bullets.forEach((b, i) => {
+                if (b.y < 0) bullets.splice(i, 1);
+                else b.update();
+            });
+
+            invaderBullets.forEach((b, i) => {
+                if (b.y > GAME_HEIGHT) invaderBullets.splice(i, 1);
+                else b.update();
+            });
+            
+            particles.forEach((p, i) => {
+                if(p.life <= 0) particles.splice(i, 1);
+                else p.update();
+            });
+
+            handleCollisions();
+            
+            if (invaders.invaders.length === 0) {
+                nextWave();
+            }
+        }
+        
+        // --- Event Listeners ---
+        window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+        window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+        
+        actionButton.addEventListener('click', () => {
+            if (gameState === 'start' || gameState === 'gameover') {
+                startGame();
+            }
+        });
+
+        // --- Initial Load ---
+        function showStartScreen() {
+             gameState = 'start';
+             messageScreen.style.display = 'block';
+             messageTitle.textContent = "PIXEL INVADERS";
+             messageText.innerHTML = "Use LEFT/RIGHT ARROWS to move.<br>Press SPACE to shoot.";
+             actionButton.textContent = "Start Game";
+        }
+        
+        window.onload = () => {
+             ctx.fillStyle = '#000';
+             ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+             showStartScreen();
+        };
+
+    </script>
+</body>
+</html>
+
