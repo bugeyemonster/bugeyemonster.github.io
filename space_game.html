@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Space Explorer</title>
+    <style>
+        /* Basic CSS to make the game full-screen */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            color: white;
+        }
+        canvas {
+            display: block;
+        }
+        #info-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            font-size: 14px;
+            pointer-events: none; /* Allows clicks to go through to the canvas if needed */
+        }
+        #controls-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="info-overlay">
+        <div>X: <span id="posX">0</span></div>
+        <div>Y: <span id="posY">0</span></div>
+        <div>Velocity: <span id="velocity">0.0</span></div>
+    </div>
+    <div id="controls-overlay">
+        [W] or [↑] to Thrust | [A]/[D] or [←]/[→] to Steer
+    </div>
+
+    <script>
+        // --- Setup ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI elements
+        const posXElem = document.getElementById('posX');
+        const posYElem = document.getElementById('posY');
+        const velocityElem = document.getElementById('velocity');
+
+        // Set canvas to full screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // --- Game Constants ---
+        const SHIP_SIZE = 20;
+        const THRUST = 0.05;
+        const TURN_SPEED = 0.07;
+        const FRICTION = 0.99; // A value less than 1 to slow down the ship over time
+        const SECTOR_SIZE = 2000; // How large each procedural grid cell is
+        const STAR_DENSITY = 0.0005; // Stars per pixel area in a sector
+        const PLANET_CHANCE = 0.4; // Chance for a planet to spawn in a sector
+
+        // --- Player Ship ---
+        const player = {
+            x: 0,
+            y: 0,
+            vx: 0, // velocity x
+            vy: 0, // velocity y
+            angle: -Math.PI / 2, // Start pointing up
+            isThrusting: false,
+        };
+
+        // --- Input Handling ---
+        const keys = {
+            w: false, 'ArrowUp': false,
+            a: false, 'ArrowLeft': false,
+            d: false, 'ArrowRight': false,
+        };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key in keys) keys[e.key] = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key in keys) keys[e.key] = false;
+        });
+
+        // --- Procedural Generation ---
+        // A simple seeded random number generator. This is crucial!
+        // It ensures that the same sector coordinates (x, y) will always generate the same universe.
+        function mulberry32(seed) {
+            return function() {
+                let t = seed += 0x6D2B79F5;
+                t = Math.imul(t ^ t >>> 15, t | 1);
+                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            }
+        }
+
+        const universeCache = new Map(); // Cache generated sectors to avoid recalculating
+
+        function getSectorObjects(sectorX, sectorY) {
+            const key = `${sectorX},${sectorY}`;
+            if (universeCache.has(key)) {
+                return universeCache.get(key);
+            }
+
+            const seed = (sectorX * 18397) + (sectorY * 2311); // Simple hash for a seed
+            const random = mulberry32(seed);
+
+            const objects = {
+                stars: [],
+                planet: null
+            };
+
+            // Generate stars
+            const numStars = Math.floor(SECTOR_SIZE * SECTOR_SIZE * STAR_DENSITY);
+            for (let i = 0; i < numStars; i++) {
+                objects.stars.push({
+                    x: sectorX * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    y: sectorY * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    size: random() * 1.5 + 0.5,
+                    brightness: random() * 0.5 + 0.5,
+                });
+            }
+
+            // Generate a planet (or not)
+            if (random() < PLANET_CHANCE) {
+                objects.planet = {
+                    x: sectorX * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    y: sectorY * SECTOR_SIZE + random() * SECTOR_SIZE,
+                    radius: random() * 150 + 50,
+                    color: `hsl(${random() * 360}, 60%, 50%)`,
+                };
+            }
+
+            universeCache.set(key, objects);
+            if (universeCache.size > 200) { // Keep cache from growing too large
+                const oldestKey = universeCache.keys().next().value;
+                universeCache.delete(oldestKey);
+            }
+
+            return objects;
+        }
+
+
+        // --- Update Function (runs every frame) ---
+        function update() {
+            player.isThrusting = keys.w || keys.ArrowUp;
+            
+            // Steering
+            if (keys.a || keys.ArrowLeft) player.angle -= TURN_SPEED;
+            if (keys.d || keys.ArrowRight) player.angle += TURN_SPEED;
+
+            // Thrust
+            if (player.isThrusting) {
+                player.vx += Math.cos(player.angle) * THRUST;
+                player.vy += Math.sin(player.angle) * THRUST;
+            }
+
+            // Apply friction
+            player.vx *= FRICTION;
+            player.vy *= FRICTION;
+
+            // Update position
+            player.x += player.vx;
+            player.y += player.vy;
+            
+            // Update UI
+            posXElem.textContent = player.x.toFixed(2);
+            posYElem.textContent = player.y.toFixed(2);
+            const speed = Math.sqrt(player.vx**2 + player.vy**2);
+            velocityElem.textContent = (speed * 100).toFixed(1); // Scale for readability
+        }
+
+        // --- Draw Function (runs every frame) ---
+        function draw() {
+            // Clear screen with a dark space color
+            ctx.fillStyle = '#000814';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Center the camera on the player
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2); // Move origin to center
+            ctx.translate(-player.x, -player.y); // Move world opposite to player
+
+            // --- Draw Universe Objects ---
+            const playerSectorX = Math.floor(player.x / SECTOR_SIZE);
+            const playerSectorY = Math.floor(player.y / SECTOR_SIZE);
+
+            // Render current sector and its neighbors (3x3 grid)
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const sector = getSectorObjects(playerSectorX + i, playerSectorY + j);
+
+                    // Draw stars
+                    sector.stars.forEach(star => {
+                        ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                        ctx.fillRect(star.x, star.y, star.size, star.size);
+                    });
+
+                    // Draw planet
+                    if (sector.planet) {
+                        ctx.beginPath();
+                        ctx.arc(sector.planet.x, sector.planet.y, sector.planet.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = sector.planet.color;
+                        ctx.fill();
+                    }
+                }
+            }
+
+            ctx.restore(); // Restore camera to normal
+
+            // --- Draw Player Ship ---
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2); // Center of the screen
+            ctx.rotate(player.angle);
+            
+            // Ship body
+            ctx.beginPath();
+            ctx.moveTo(SHIP_SIZE / 2, 0); // Nose
+            ctx.lineTo(-SHIP_SIZE / 2, -SHIP_SIZE / 3); // Left wing
+            ctx.lineTo(-SHIP_SIZE / 2, SHIP_SIZE / 3); // Right wing
+            ctx.closePath();
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Thrust flame
+            if (player.isThrusting) {
+                ctx.beginPath();
+                ctx.moveTo(-SHIP_SIZE / 2, 0);
+                ctx.lineTo(-SHIP_SIZE, Math.random() * SHIP_SIZE / 4 - SHIP_SIZE / 8);
+                ctx.lineTo(-SHIP_SIZE / 2, 0);
+                ctx.fillStyle = 'orange';
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        // --- Main Game Loop ---
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game!
+        gameLoop();
+
+    </script>
+</body>
+</html>
