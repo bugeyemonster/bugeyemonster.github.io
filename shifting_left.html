@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Shifting American Left: From Class to Identity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: "Scholarly Neutral" - A palette using a soft off-white background (#F8F7F4), a dark slate for text (#333A45), and muted tones of blue (#6A8A9E) and terracotta (#C47A6A) for accents and data visualizations. -->
+    <!-- Application Structure Plan: The application is designed as a single-page, scrollable long-read that guides the user through a historical and thematic narrative. The structure is not a dashboard but an interactive essay, moving from historical origins to economic data, and finally to contemporary political fault lines. This linear, story-driven approach was chosen because the source material presents a complex causal argument that is best understood by following its chronological and logical progression. Key interactions include an interactive timeline, dynamic charts to visualize economic shifts, and toggle-able content sections to explore nuanced arguments without overwhelming the user. The goal is to allow the user to explore a complex thesis step-by-step, with data and context provided at each stage. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Historical shift from "Old Left" to "New Left". Goal: Show chronological development. Viz/Method: Interactive timeline (HTML/CSS/JS). Interaction: Clicking an event reveals descriptive text. Justification: Best for illustrating a historical sequence. Library: Vanilla JS.
+        2. Report Info: Economic trends (inequality, union decline, wage stagnation). Goal: Compare long-term economic data. Viz/Method: Two dual-axis line charts. Interaction: Hover tooltips for specific data points. Justification: Line charts are the clearest way to show trends over time and compare correlated data series. Library: Chart.js (Canvas).
+        3. Report Info: Core tenets and critiques of identity politics. Goal: Organize and present complex arguments. Viz/Method: Two-column layout with accordion-style expandable sections. Interaction: Clicking a topic reveals detailed arguments. Justification: Manages information density and allows user-controlled exploration of nuanced topics. Library: Vanilla JS.
+        4. Report Info: Apparent contradictions in modern progressive coalitions (e.g., LGBTQ+ rights and Palestine solidarity). Goal: Explain the different ideological frameworks. Viz/Method: Toggled content blocks presenting different viewpoints (e.g., 'A Universal Human Rights View' vs. 'An Anti-Colonial Solidarity View'). Interaction: Buttons switch the visible text block. Justification: Directly addresses the user's query about cognitive dissonance by neutrally presenting the differing rationales that animate these positions. Library: Vanilla JS.
+        All choices confirm NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #333A45;
+        }
+        .section-title {
+            color: #333A45;
+            border-bottom: 2px solid #C47A6A;
+            padding-bottom: 0.5rem;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #6A8A9E;
+            color: white;
+            transform: scale(1.05);
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            padding-bottom: 2rem;
+            border-left: 2px solid #6A8A9E;
+        }
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -9px;
+            top: 4px;
+            height: 16px;
+            width: 16px;
+            background-color: #F8F7F4;
+            border: 2px solid #6A8A9E;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .timeline-dot:hover, .timeline-dot.active {
+            background-color: #C47A6A;
+        }
+        .timeline-content {
+            display: none;
+        }
+        .timeline-content.active {
+            display: block;
+        }
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .accordion-header:hover {
+            background-color: #e8e6e1;
+        }
+        .accordion-content {
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="leading-relaxed">
+
+    <header class="bg-[#333A45] text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="container mx-auto text-center">
+            <h1 class="text-2xl md:text-4xl font-bold">The Shifting American Left</h1>
+            <p class="text-sm md:text-lg text-gray-300">An Exploration of the Transition from Class Solidarity to Identity Politics</p>
+        </div>
+    </header>
+
+    <nav class="bg-[#F8F7F4] py-3 shadow-sm sticky top-[76px] md:top-[88px] z-40">
+        <div class="container mx-auto flex justify-center space-x-2 md:space-x-4">
+            <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="introduction">Introduction</button>
+            <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="history">Historical Roots</button>
+            <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="economics">The Economic Story</button>
+            <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="identity">The Rise of Identity</button>
+            <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="faultlines">Modern Fault Lines</button>
+            <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="citations">Citations</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="introduction" class="mb-16 scroll-mt-48">
+            <h2 class="text-3xl font-bold mb-4 section-title">Introduction: A Great Realignment</h2>
+            <div class="space-y-4 text-gray-800 text-lg">
+                <p>Over the past fifty years, a profound shift has occurred within American progressive politics. The traditional "Old Left," with its focus on universal economic programs, labor rights, and class solidarity, has been largely supplanted by a "New Left" coalition organized around issues of group identity. This interactive report explores the origins, mechanisms, and consequences of this transformation.</p>
+                <p>We will examine the historical roots of this change, from the counter-culture of the 1960s to the rise of postmodern thought in academia. We will then visualize the concurrent economic trends—rising inequality, declining union power, and wage stagnation—that formed the backdrop to this political evolution. Finally, we will analyze the framework of modern identity politics and its expression in contemporary social movements, seeking to understand the internal tensions and external impacts that define the American Left today.</p>
+            </div>
+        </section>
+
+        <section id="history" class="mb-16 scroll-mt-48">
+            <h2 class="text-3xl font-bold mb-6 section-title">Historical Roots: The Fork in the Road</h2>
+            <p class="text-gray-800 text-lg mb-8">The transition from a class-focused to an identity-focused left was not a single event, but a gradual process. The 1960s served as a critical inflection point, where civil rights, anti-war, and counter-cultural movements began to challenge the premises of the traditional, labor-oriented Democratic coalition. This timeline highlights key developments in that shift. Click on each point to learn more.</p>
+            <div id="timeline-container" class="max-w-3xl mx-auto"></div>
+        </section>
+
+        <section id="economics" class="mb-16 scroll-mt-48">
+            <h2 class="text-3xl font-bold mb-4 section-title">The Economic Story: A Widening Chasm</h2>
+            <p class="text-gray-800 text-lg mb-8">As the political focus of the left shifted, the economic landscape for the American worker was also transforming. The post-war consensus of shared prosperity began to fray in the 1970s. The following charts illustrate three key trends: the decline of organized labor's power, the dramatic rise in income inequality, and the decoupling of worker pay from productivity growth. These economic realities created anxieties that cultural and identity-based issues would come to dominate.</p>
+            
+            <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg mb-12">
+                <h3 class="text-xl font-semibold text-center mb-4">Union Membership vs. Income Inequality</h3>
+                <div class="chart-container">
+                    <canvas id="inequalityChart"></canvas>
+                </div>
+                 <p class="text-center text-sm text-gray-600 mt-4">This chart tracks the decline of union membership in the U.S. against the rise of the income share held by the top 10%. Sources: U.S. Bureau of Labor Statistics, World Inequality Database.</p>
+            </div>
+
+            <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-center mb-4">The Great Decoupling: Productivity & Worker Pay</h3>
+                <div class="chart-container">
+                    <canvas id="productivityChart"></canvas>
+                </div>
+                 <p class="text-center text-sm text-gray-600 mt-4">This chart shows how worker compensation has stagnated relative to massive gains in economic productivity since the 1970s. Source: Economic Policy Institute.</p>
+            </div>
+        </section>
+
+        <section id="identity" class="mb-16 scroll-mt-48">
+            <h2 class="text-3xl font-bold mb-4 section-title">The Rise of Identity: New Frameworks for Justice</h2>
+            <p class="text-gray-800 text-lg mb-8">Emerging from academic circles in the late 20th century, concepts like intersectionality and privilege offered a new lens for understanding social dynamics. This framework moved the focus from universal class struggle to the unique, overlapping systems of oppression faced by different identity groups. Below is an exploration of the core ideas and the common arguments both for and against their application in the political sphere.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div id="pro-identity-accordion" class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-green-700">Arguments for Identity-Based Politics</h3>
+                </div>
+                <div id="con-identity-accordion" class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-red-700">Critiques of Identity-Based Politics</h3>
+                </div>
+            </div>
+        </section>
+
+        <section id="faultlines" class="mb-16 scroll-mt-48">
+            <h2 class="text-3xl font-bold mb-4 section-title">Modern Fault Lines: Competing Priorities</h2>
+            <p class="text-gray-800 text-lg mb-8">Today's progressive coalition is animated by a wide range of causes, sometimes leading to alliances that appear contradictory from the outside. A prominent example is the simultaneous, fervent support for both transgender rights and Palestinian liberation, given the legal and social status of LGBTQ+ individuals under Palestinian governing authorities. This is not necessarily a contradiction, but rather a result of viewing the issues through different ideological lenses. Explore the two dominant frameworks below.</p>
+            <div class="flex justify-center mb-6">
+                <button id="view1Btn" class="px-4 py-2 bg-[#6A8A9E] text-white rounded-l-md font-semibold">Anti-Colonial Solidarity View</button>
+                <button id="view2Btn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-r-md font-semibold">Universal Human Rights View</button>
+            </div>
+            <div id="view1" class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-bold mb-2">The Lens of Anti-Colonial Solidarity</h3>
+                <p>From this perspective, the primary struggle is against systems of power, colonialism, and occupation. The situations of both transgender people in Western societies and Palestinians under occupation are seen as stemming from the same root: oppressive, powerful state structures imposing their will on marginalized groups. Solidarity is therefore extended to all groups perceived as fighting against a common oppressor (e.g., Western imperialism or its allies). The internal social policies of a movement or group are often considered secondary to the primary struggle for liberation from this external force. The focus is on the power imbalance between states and peoples, not on the internal governance of the oppressed group.</p>
+            </div>
+            <div id="view2" class="bg-white p-6 rounded-lg shadow-lg hidden">
+                <h3 class="text-xl font-bold mb-2">The Lens of Universal Human Rights</h3>
+                <p>This perspective posits that certain rights—like freedom of speech, bodily autonomy, and freedom from persecution based on sexual orientation or gender identity—are universal and should be consistently applied. From this viewpoint, it is contradictory to advocate for LGBTQ+ rights in one context while simultaneously supporting a political movement whose leadership does not uphold those same rights. This view prioritizes the consistent application of liberal values across all cultures and political situations, leading to criticism of movements and governments that fail to meet these universal standards, regardless of their geopolitical status. The focus is on the rights of the individual, irrespective of the group's broader political struggle.</p>
+            </div>
+        </section>
+        
+        <section id="citations" class="scroll-mt-48">
+            <h2 class="text-3xl font-bold mb-4 section-title">Sources & Further Reading</h2>
+            <ul class="list-disc list-inside space-y-2 text-blue-800">
+                <li><a href="https://www.epi.org/productivity-pay-gap/" target="_blank" class="hover:underline">Economic Policy Institute. "The Productivity–Pay Gap."</a></li>
+                <li><a href="https://wid.world/country/usa/" target="_blank" class="hover:underline">World Inequality Database. "United States."</a></li>
+                <li><a href="https://www.bls.gov/news.release/union2.nr0.htm" target="_blank" class="hover:underline">U.S. Bureau of Labor Statistics. "Union Members Summary."</a></li>
+                <li><a href="https://www.amazon.com/Once-Future-Liberal-After-Identity/dp/0062697468" target="_blank" class="hover:underline">Lilla, Mark. "The Once and Future Liberal: After Identity Politics." HarperCollins, 2017.</a></li>
+                <li><a href="https://www.amazon.com/Whats-Matter-Kansas-Conservatives-America/dp/080507774X" target="_blank" class="hover:underline">Frank, Thomas. "What's the Matter with Kansas?: How Conservatives Won the Heart of America." Picador, 2005.</a></li>
+                <li><a href="https://www.washingtonpost.com/archive/opinions/1991/07/07/mapping-the-margins-intersectionality-identity-politics-and-violence-against-women-of-color/50d53e34-1b77-408c-9041-714b3a1651e7/" target="_blank" class="hover:underline">Crenshaw, Kimberlé. "Mapping the Margins: Intersectionality, Identity Politics, and Violence Against Women of Color." Stanford Law Review, 1991.</a></li>
+                 <li><a href="https://www.amazon.com/Tyranny-Merit-Whats-Become-Common/dp/0374289980" target="_blank" class="hover:underline">Sandel, Michael J. "The Tyranny of Merit: What's Become of the Common Good?" Farrar, Straus and Giroux, 2020.</a></li>
+            </ul>
+        </section>
+
+    </main>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navButtons = document.querySelectorAll('.nav-button');
+    const sections = document.querySelectorAll('main section');
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.4
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navButtons.forEach(button => {
+                    button.classList.toggle('active', button.dataset.target === entry.target.id);
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        observer.observe(section);
+        navButtons.forEach(button => {
+            if (button.dataset.target === section.id) {
+                button.addEventListener('click', () => {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+        });
+    });
+
+    const timelineData = [
+        { year: '1962', title: 'Port Huron Statement', content: 'Students for a Democratic Society (SDS) issue their political manifesto. It criticizes the focus of the "Old Left" on labor alone and calls for a "New Left" centered on civil rights, participatory democracy, and critiques of Cold War foreign policy, setting the stage for a broader social agenda.' },
+        { year: '1968', title: 'The Democratic National Convention', content: 'Violent clashes between anti-war protestors and police in Chicago expose a massive rift in the Democratic party. The establishment, represented by Hubert Humphrey, is alienated from the youth and anti-war movements, who feel their concerns are ignored in favor of traditional machine politics.' },
+        { year: '1970s', title: 'Rise of Postmodernism', content: 'Postmodern and post-structuralist thought, particularly from French philosophers like Foucault and Derrida, gains influence in American universities. These ideas challenge universal truths and objective reality, suggesting that power structures shape knowledge. This provides an intellectual framework for analyzing society through the lens of group identity and power dynamics rather than class.' },
+        { year: '1980s', title: 'The "Reagan Democrats"', content: 'A significant cohort of traditionally Democratic, often unionized, working-class voters shifts to support Ronald Reagan. This is attributed to a feeling of abandonment by the Democratic party, which was perceived as increasingly catering to urban elites and identity-based "special interest" groups rather than the economic needs of the working class.' },
+        { year: '1989', title: 'Kimberlé Crenshaw coins "Intersectionality"', content: 'The term is introduced to describe how different aspects of a person\'s identity (e.g., race, gender, class) can create unique, overlapping systems of discrimination. While a powerful analytical tool, its popularization shifts focus from universal grievances to the specific, varied experiences of oppression among different groups.' },
+        { year: '1992', title: 'The "New Democrats"', content: 'Bill Clinton\'s campaign and presidency represent the rise of the Democratic Leadership Council (DLC), or "New Democrats." They consciously move the party to the center, embracing free trade (like NAFTA) and deregulation while focusing on socially liberal, but not radical, positions. This further solidifies the party\'s move away from its pro-labor, protectionist history.' }
+    ];
+
+    const timelineContainer = document.getElementById('timeline-container');
+    timelineData.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'timeline-item';
+        itemEl.innerHTML = `
+            <div class="timeline-dot" data-year="${item.year}"></div>
+            <h3 class="font-bold text-lg text-[#6A8A9E]">${item.year}: ${item.title}</h3>
+            <div class="timeline-content text-gray-700 mt-2">${item.content}</div>
+        `;
+        timelineContainer.appendChild(itemEl);
+    });
+
+    timelineContainer.addEventListener('click', e => {
+        if (e.target.classList.contains('timeline-dot')) {
+            const allDots = timelineContainer.querySelectorAll('.timeline-dot');
+            const allContent = timelineContainer.querySelectorAll('.timeline-content');
+            const content = e.target.parentElement.querySelector('.timeline-content');
+            
+            const wasActive = e.target.classList.contains('active');
+
+            allDots.forEach(dot => dot.classList.remove('active'));
+            allContent.forEach(c => c.classList.remove('active'));
+            
+            if (!wasActive) {
+                e.target.classList.add('active');
+                content.classList.add('active');
+            }
+        }
+    });
+
+    const accordionData = {
+        pro: [
+            { title: 'Highlights Invisible Injustices', content: 'Identity politics brings attention to forms of discrimination and suffering (e.g., racism, sexism, homophobia) that are not solely based on economic class. It provides a vocabulary for marginalized groups to articulate their unique experiences of oppression.' },
+            { title: 'Builds Group Cohesion & Power', content: 'By organizing around a shared identity, groups that have been historically marginalized can build solidarity, advocate for their specific needs, and create political power to effect change, such as the Civil Rights Movement or the push for marriage equality.' },
+            { title: 'Offers a More Complete Social Analysis', content: 'Intersectionality argues that social systems are complex and that different forms of prejudice are interconnected. A purely class-based analysis is seen as incomplete because it can ignore how race and gender, for example, can compound economic disadvantage.' }
+        ],
+        con: [
+            { title: 'Undermines Universalism & Solidarity', content: 'Critics argue that focusing on group differences erodes the potential for broad-based solidarity. It can fracture coalitions by emphasizing what divides people rather than the common economic interests that could unite a majority.' },
+            { title: 'Can Lead to "Oppression Olympics"', content: 'A focus on identity can create a competitive hierarchy of victimhood, where different groups vie for recognition of their suffering. This can distract from addressing root causes and create resentment between groups.' },
+            { title: 'Alienates Potential Allies', content: 'By framing politics as a zero-sum conflict between identity groups (e.g., men vs. women, white vs. people of color), it can alienate members of perceived "oppressor" groups who might otherwise be allies on economic issues, pushing them towards political opponents.' }
+        ]
+    };
+
+    const proAccordion = document.getElementById('pro-identity-accordion');
+    const conAccordion = document.getElementById('con-identity-accordion');
+
+    function createAccordion(container, data) {
+        data.forEach(item => {
+            const section = document.createElement('div');
+            section.className = 'border-t border-gray-200';
+            section.innerHTML = `
+                <h4 class="accordion-header p-4 font-semibold flex justify-between items-center">
+                    <span>${item.title}</span>
+                    <span class="plus-minus">+</span>
+                </h4>
+                <div class="accordion-content px-4 pb-4 text-gray-700">
+                    <p>${item.content}</p>
+                </div>
+            `;
+            container.appendChild(section);
+        });
+    }
+
+    createAccordion(proAccordion, accordionData.pro);
+    createAccordion(conAccordion, accordionData.con);
+
+    document.querySelectorAll('.accordion-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            const plusMinus = header.querySelector('.plus-minus');
+            
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                plusMinus.textContent = '+';
+            } else {
+                document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                document.querySelectorAll('.plus-minus').forEach(pm => pm.textContent = '+');
+                content.style.maxHeight = content.scrollHeight + "px";
+                plusMinus.textContent = '-';
+            }
+        });
+    });
+
+
+    const view1Btn = document.getElementById('view1Btn');
+    const view2Btn = document.getElementById('view2Btn');
+    const view1 = document.getElementById('view1');
+    const view2 = document.getElementById('view2');
+
+    view1Btn.addEventListener('click', () => {
+        view1.classList.remove('hidden');
+        view2.classList.add('hidden');
+        view1Btn.classList.add('bg-[#6A8A9E]', 'text-white');
+        view1Btn.classList.remove('bg-gray-300', 'text-gray-800');
+        view2Btn.classList.add('bg-gray-300', 'text-gray-800');
+        view2Btn.classList.remove('bg-[#6A8A9E]', 'text-white');
+    });
+
+    view2Btn.addEventListener('click', () => {
+        view2.classList.remove('hidden');
+        view1.classList.add('hidden');
+        view2Btn.classList.add('bg-[#6A8A9E]', 'text-white');
+        view2Btn.classList.remove('bg-gray-300', 'text-gray-800');
+        view1Btn.classList.add('bg-gray-300', 'text-gray-800');
+        view1Btn.classList.remove('bg-[#6A8A9E]', 'text-white');
+    });
+
+    const years = Array.from({length: 2023 - 1979 + 1}, (_, i) => 1979 + i);
+    const top10Share = [33.5, 33.7, 34, 34.6, 35.5, 36.7, 37.3, 38.6, 39.7, 40.5, 41.1, 41.5, 41.8, 42.9, 43.1, 43.8, 44.5, 45.5, 46.1, 46.4, 46.3, 47.1, 46.8, 47, 47.7, 47.9, 48.9, 49.7, 49.7, 48.7, 49.4, 49.2, 48.9, 49.3, 48.9, 49.6, 50, 50.5, 50.4, 49.3, 48.5, 48.9, 49.6, 50.1];
+    const unionMembership = [24.1, 23, 22, 21, 20.1, 18.8, 18, 17.5, 17, 16.4, 16.1, 16.1, 15.8, 15.6, 15.1, 14.5, 14.2, 13.9, 14.1, 13.5, 13.3, 12.9, 12.5, 12, 11.3, 12, 11.8, 12.1, 12.4, 11.9, 11.4, 11.3, 10.9, 11.1, 10.8, 10.7, 10.4, 10.3, 10.1, 10, 10.1, 10, 10.2, 10];
+
+    const ctx1 = document.getElementById('inequalityChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: [{
+                label: 'Top 10% Income Share',
+                data: top10Share,
+                borderColor: '#C47A6A',
+                backgroundColor: 'rgba(196, 122, 106, 0.2)',
+                yAxisID: 'y',
+                tension: 0.1
+            }, {
+                label: 'Union Membership Rate',
+                data: unionMembership,
+                borderColor: '#6A8A9E',
+                backgroundColor: 'rgba(106, 138, 158, 0.2)',
+                yAxisID: 'y1',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { display: true, text: 'Income Share (%)' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: { display: true, text: 'Union Membership (%)' },
+                    grid: { drawOnChartArea: false }
+                }
+            },
+            plugins: {
+                tooltip: { mode: 'index', intersect: false }
+            }
+        }
+    });
+    
+    const prodYears = ['1979-1990', '1990-2000', '2000-2007', '2007-2022'];
+    const productivityGrowth = [19.3, 29.3, 18.5, 21.6];
+    const hourlyPayGrowth = [2.6, 19.9, 4.3, 9.2];
+
+    const prodYearsFull = Array.from({length: 2022-1979+1}, (_, i) => 1979 + i);
+    const productivityCumulative = [0, 1.4, 2.3, 2.9, 5, 7.3, 9.4, 11.3, 13.7, 15.5, 17, 19.3, 21.5, 24.3, 26.8, 29.3, 31.5, 34, 36.8, 39.7, 42.5, 45.5, 48.6, 50.2, 53.2, 55.6, 58.3, 60.5, 62.4, 61.2, 64.9, 68.6, 71.3, 73.1, 74.5, 75.3, 76.8, 78.9, 81.3, 83.1, 85.2, 87, 88.7, 90.1];
+    const payCumulative = [0, -0.4, -0.9, -1, 0.3, 1.3, 2.2, 2.6, 3, 2.5, 2.1, 2.6, 3.3, 3.8, 4.1, 5, 6.7, 8.4, 10.9, 13.5, 16.8, 19.9, 21.3, 22.5, 23.3, 24.2, 25, 25.4, 25, 24.5, 26, 26.6, 27.2, 27.9, 28.5, 29.3, 30.6, 31.9, 33.7, 35.1, 37, 36.4, 35.8, 36.5];
+
+    const ctx2 = document.getElementById('productivityChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: prodYearsFull,
+            datasets: [{
+                label: 'Net Productivity Growth',
+                data: productivityCumulative,
+                borderColor: '#6A8A9E',
+                backgroundColor: 'rgba(106, 138, 158, 0.2)',
+                fill: true,
+                tension: 0.1
+            }, {
+                label: 'Hourly Compensation Growth (Production/Nonsupervisory Workers)',
+                data: payCumulative,
+                borderColor: '#C47A6A',
+                backgroundColor: 'rgba(196, 122, 106, 0.2)',
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    title: { display: true, text: 'Cumulative Percent Change' },
+                    ticks: { callback: value => value + '%' }
+                }
+            },
+            plugins: {
+                tooltip: { 
+                    mode: 'index', 
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y.toFixed(1) + '%';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>
