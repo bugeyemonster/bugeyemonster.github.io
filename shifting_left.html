@@ -8,12 +8,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: "Scholarly Neutral" - A palette using a soft off-white background (#F8F7F4), a dark slate for text (#333A45), and muted tones of blue (#6A8A9E) and terracotta (#C47A6A) for accents and data visualizations. -->
-    <!-- Application Structure Plan: The application is designed as a single-page, scrollable long-read that guides the user through a historical and thematic narrative. The structure is not a dashboard but an interactive essay, moving from historical origins to economic data, and finally to contemporary political fault lines. This linear, story-driven approach was chosen because the source material presents a complex causal argument that is best understood by following its chronological and logical progression. Key interactions include an interactive timeline, dynamic charts to visualize economic shifts, and toggle-able content sections to explore nuanced arguments without overwhelming the user. The goal is to allow the user to explore a complex thesis step-by-step, with data and context provided at each stage. -->
+    <!-- Application Structure Plan: The application is designed as a single-page, scrollable long-read that guides the user through a historical and thematic narrative. The structure is an interactive essay, moving from historical origins to economic data (now heavily focused on the policy shift), and finally to contemporary political fault lines. This approach is used to follow the complex causal argument that the progressive shift to identity politics led to the active alienation of the working class, while the Democratic party simultaneously shifted right on economic policy, resulting in a dual abandonment of the worker. Key interactions include an interactive timeline, dynamic charts to visualize economic shifts, and toggle-able content sections to explore nuanced arguments. -->
     <!-- Visualization & Content Choices: 
         1. Report Info: Historical shift from "Old Left" to "New Left". Goal: Show chronological development. Viz/Method: Interactive timeline (HTML/CSS/JS). Interaction: Clicking an event reveals descriptive text. Justification: Best for illustrating a historical sequence. Library: Vanilla JS.
-        2. Report Info: Economic trends (inequality, union decline, wage stagnation). Goal: Compare long-term economic data. Viz/Method: Two dual-axis line charts. Interaction: Hover tooltips for specific data points. Justification: Line charts are the clearest way to show trends over time and compare correlated data series. Library: Chart.js (Canvas).
-        3. Report Info: Core tenets and critiques of identity politics. Goal: Organize and present complex arguments. Viz/Method: Two-column layout with accordion-style expandable sections. Interaction: Clicking a topic reveals detailed arguments. Justification: Manages information density and allows user-controlled exploration of nuanced topics. Library: Vanilla JS.
-        4. Report Info: Apparent contradictions in modern progressive coalitions (e.g., LGBTQ+ rights and Palestine solidarity). Goal: Explain the different ideological frameworks. Viz/Method: Toggled content blocks presenting different viewpoints (e.g., 'A Universal Human Rights View' vs. 'An Anti-Colonial Solidarity View'). Interaction: Buttons switch the visible text block. Justification: Directly addresses the user's query about cognitive dissonance by neutrally presenting the differing rationales that animate these positions. Library: Vanilla JS.
+        2. Report Info: Economic trends (inequality, union decline, pay stagnation) and Democratic Policy Shift. Goal: Visualize the context of worker abandonment. Viz/Method: Two dual-axis line charts. Interaction: Hover tooltips for specific data points. Justification: Line charts clearly show the adverse long-term trends faced by workers, highlighting the timing of the political policy shift. Library: Chart.js (Canvas).
+        3. Report Info: Core tenets and critiques, including the argument of active alienation. Goal: Organize and present complex arguments. Viz/Method: Two-column layout with accordion-style expandable sections. Interaction: Clicking a topic reveals detailed arguments, including the specific critique of shaming the working class. Justification: Manages information density and allows user-controlled exploration of nuanced topics. Library: Vanilla JS.
+        4. Report Info: Apparent contradictions in modern progressive coalitions. Goal: Explain the different ideological frameworks. Viz/Method: Toggled content blocks presenting different viewpoints. Interaction: Buttons switch the visible text block. Justification: Directly addresses the user's query about cognitive dissonance by neutrally presenting the differing rationales that animate these positions. Library: Vanilla JS.
         All choices confirm NO SVG/Mermaid. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -38,6 +38,7 @@
         }
         .nav-button {
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         .nav-button.active {
             background-color: #6A8A9E;
@@ -99,7 +100,7 @@
     </header>
 
     <nav class="bg-[#F8F7F4] py-3 shadow-sm sticky top-[76px] md:top-[88px] z-40">
-        <div class="container mx-auto flex justify-center space-x-2 md:space-x-4">
+        <div class="container mx-auto flex justify-center space-x-2 md:space-x-4 overflow-x-auto px-4">
             <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="introduction">Introduction</button>
             <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="history">Historical Roots</button>
             <button class="nav-button px-3 py-1 md:px-4 md:py-2 text-xs md:text-sm font-semibold rounded-full bg-gray-200 text-gray-700" data-target="economics">The Economic Story</button>
@@ -112,10 +113,10 @@
     <main class="container mx-auto p-4 md:p-8">
 
         <section id="introduction" class="mb-16 scroll-mt-48">
-            <h2 class="text-3xl font-bold mb-4 section-title">Introduction: A Great Realignment</h2>
+            <h2 class="text-3xl font-bold mb-4 section-title">Introduction: The Great Abandonment</h2>
             <div class="space-y-4 text-gray-800 text-lg">
-                <p>Over the past fifty years, a profound shift has occurred within American progressive politics. The traditional "Old Left," with its focus on universal economic programs, labor rights, and class solidarity, has been largely supplanted by a "New Left" coalition organized around issues of group identity. This interactive report explores the origins, mechanisms, and consequences of this transformation.</p>
-                <p>We will examine the historical roots of this change, from the counter-culture of the 1960s to the rise of postmodern thought in academia. We will then visualize the concurrent economic trends—rising inequality, declining union power, and wage stagnation—that formed the backdrop to this political evolution. Finally, we will analyze the framework of modern identity politics and its expression in contemporary social movements, seeking to understand the internal tensions and external impacts that define the American Left today.</p>
+                <p>The political landscape of the American progressive movement has undergone a fundamental transformation over the last five decades. The traditional emphasis on universal economic programs and labor rights was replaced by a framework dominated by **identity politics** and cultural recognition.</p>
+                <p>This report explores the central argument that this shift resulted in the **active political and cultural alienation** of the white, straight, working-class male—the historical base of the Democratic Party—while simultaneously, the party's policy establishment drifted rightward on core economic issues. This dual abandonment, where the working poor were both shamed rhetorically and ignored economically, is argued to be a primary cause of the political party's collapse as a worker-oriented force, contributing to the nation's severe inequality and political polarization.</p>
             </div>
         </section>
 
@@ -126,8 +127,8 @@
         </section>
 
         <section id="economics" class="mb-16 scroll-mt-48">
-            <h2 class="text-3xl font-bold mb-4 section-title">The Economic Story: A Widening Chasm</h2>
-            <p class="text-gray-800 text-lg mb-8">As the political focus of the left shifted, the economic landscape for the American worker was also transforming. The post-war consensus of shared prosperity began to fray in the 1970s. The following charts illustrate three key trends: the decline of organized labor's power, the dramatic rise in income inequality, and the decoupling of worker pay from productivity growth. These economic realities created anxieties that cultural and identity-based issues would come to dominate.</p>
+            <h2 class="text-3xl font-bold mb-4 section-title">The Economic Story: Policy Shift and Worker Plight</h2>
+            <p class="text-gray-800 text-lg mb-8">As the political focus of the left shifted towards identity, the Democratic political establishment simultaneously moved to the right on economic policy. Under groups like the Democratic Leadership Council (DLC), the party embraced deregulation and free trade agreements, effectively abandoning its core mission of supporting organized labor and worker protections. This is evident even in recent administrations, where policies like those under President Obama often resembled the economic approaches of prior conservative administrations, doing little to enhance union power despite having the political opportunity. The charts below illustrate the economic decay that occurred while the party's focus was elsewhere.</p>
             
             <div class="bg-white p-4 md:p-6 rounded-lg shadow-lg mb-12">
                 <h3 class="text-xl font-semibold text-center mb-4">Union Membership vs. Income Inequality</h3>
@@ -148,7 +149,7 @@
 
         <section id="identity" class="mb-16 scroll-mt-48">
             <h2 class="text-3xl font-bold mb-4 section-title">The Rise of Identity: New Frameworks for Justice</h2>
-            <p class="text-gray-800 text-lg mb-8">Emerging from academic circles in the late 20th century, concepts like intersectionality and privilege offered a new lens for understanding social dynamics. This framework moved the focus from universal class struggle to the unique, overlapping systems of oppression faced by different identity groups. Below is an exploration of the core ideas and the common arguments both for and against their application in the political sphere.</p>
+            <p class="text-gray-800 text-lg mb-8">Emerging from academic circles, concepts like intersectionality offered a new lens for understanding social dynamics, shifting the focus from universal class struggle to the unique, overlapping oppressions faced by different identity groups. This political focus came at the expense of class issues and often included the cultural marginalization of the straight white male working class. Below is an exploration of the core ideas and the critical arguments regarding their political application.</p>
             <div class="grid md:grid-cols-2 gap-8">
                 <div id="pro-identity-accordion" class="bg-white p-4 rounded-lg shadow">
                     <h3 class="text-2xl font-bold text-center mb-4 text-green-700">Arguments for Identity-Based Politics</h3>
@@ -228,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { year: '1970s', title: 'Rise of Postmodernism', content: 'Postmodern and post-structuralist thought, particularly from French philosophers like Foucault and Derrida, gains influence in American universities. These ideas challenge universal truths and objective reality, suggesting that power structures shape knowledge. This provides an intellectual framework for analyzing society through the lens of group identity and power dynamics rather than class.' },
         { year: '1980s', title: 'The "Reagan Democrats"', content: 'A significant cohort of traditionally Democratic, often unionized, working-class voters shifts to support Ronald Reagan. This is attributed to a feeling of abandonment by the Democratic party, which was perceived as increasingly catering to urban elites and identity-based "special interest" groups rather than the economic needs of the working class.' },
         { year: '1989', title: 'Kimberlé Crenshaw coins "Intersectionality"', content: 'The term is introduced to describe how different aspects of a person\'s identity (e.g., race, gender, class) can create unique, overlapping systems of discrimination. While a powerful analytical tool, its popularization shifts focus from universal grievances to the specific, varied experiences of oppression among different groups.' },
-        { year: '1992', title: 'The "New Democrats"', content: 'Bill Clinton\'s campaign and presidency represent the rise of the Democratic Leadership Council (DLC), or "New Democrats." They consciously move the party to the center, embracing free trade (like NAFTA) and deregulation while focusing on socially liberal, but not radical, positions. This further solidifies the party\'s move away from its pro-labor, protectionist history.' }
+        { year: '1992', title: 'The "New Democrats" and DLC', content: 'Bill Clinton\'s campaign and presidency represent the rise of the Democratic Leadership Council (DLC), or "New Democrats." They consciously move the party to the center, embracing free trade (like NAFTA) and deregulation. This move prioritizes corporate interests over pro-labor, protectionist history, making the party\'s shift rightward on economics official.' }
     ];
 
     const timelineContainer = document.getElementById('timeline-container');
@@ -268,9 +269,9 @@ document.addEventListener('DOMContentLoaded', function () {
             { title: 'Offers a More Complete Social Analysis', content: 'Intersectionality argues that social systems are complex and that different forms of prejudice are interconnected. A purely class-based analysis is seen as incomplete because it can ignore how race and gender, for example, can compound economic disadvantage.' }
         ],
         con: [
-            { title: 'Undermines Universalism & Solidarity', content: 'Critics argue that focusing on group differences erodes the potential for broad-based solidarity. It can fracture coalitions by emphasizing what divides people rather than the common economic interests that could unite a majority.' },
-            { title: 'Can Lead to "Oppression Olympics"', content: 'A focus on identity can create a competitive hierarchy of victimhood, where different groups vie for recognition of their suffering. This can distract from addressing root causes and create resentment between groups.' },
-            { title: 'Alienates Potential Allies', content: 'By framing politics as a zero-sum conflict between identity groups (e.g., men vs. women, white vs. people of color), it can alienate members of perceived "oppressor" groups who might otherwise be allies on economic issues, pushing them towards political opponents.' }
+            { title: 'Active Alienation of the Working Class', content: 'This approach often assigns political or social "clout" based on demographic status (sex, skin color, orientation), actively shaming and marginalizing groups perceived as privileged (e.g., straight white men), regardless of their economic hardship. This leads to the abandonment of the left by the largest cohort of the working poor.' },
+            { title: 'Undermines Universalism & Solidarity', content: 'Critics argue that focusing on group differences erodes the potential for broad-based solidarity. It can fracture coalitions by emphasizing what divides people rather than the common economic interests that could unite a majority against the ultra-wealthy.' },
+            { title: 'Policy Over-Focus on Regulation', content: 'The political emphasis shifts from universal economic policies (like union protection or progressive taxation) to cultural recognition and the regulatory level of federal government, distracting from and weakening the platform for working-class economic rights.' }
         ]
     };
 
@@ -284,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
             section.innerHTML = `
                 <h4 class="accordion-header p-4 font-semibold flex justify-between items-center">
                     <span>${item.title}</span>
-                    <span class="plus-minus">+</span>
+                    <span class="plus-minus text-[#C47A6A] font-bold text-xl leading-none">+</span>
                 </h4>
                 <div class="accordion-content px-4 pb-4 text-gray-700">
                     <p>${item.content}</p>
@@ -302,14 +303,20 @@ document.addEventListener('DOMContentLoaded', function () {
             const content = header.nextElementSibling;
             const plusMinus = header.querySelector('.plus-minus');
             
-            if (content.style.maxHeight) {
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
                 content.style.maxHeight = null;
                 plusMinus.textContent = '+';
             } else {
-                document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
-                document.querySelectorAll('.plus-minus').forEach(pm => pm.textContent = '+');
+                let currentMaxHeight = 0;
+                document.querySelectorAll('.accordion-content').forEach(c => {
+                    if (c !== content) {
+                        c.style.maxHeight = null;
+                        c.previousElementSibling.querySelector('.plus-minus').textContent = '+';
+                    }
+                });
+                
                 content.style.maxHeight = content.scrollHeight + "px";
-                plusMinus.textContent = '-';
+                plusMinus.textContent = '–';
             }
         });
     });
@@ -387,10 +394,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     
-    const prodYears = ['1979-1990', '1990-2000', '2000-2007', '2007-2022'];
-    const productivityGrowth = [19.3, 29.3, 18.5, 21.6];
-    const hourlyPayGrowth = [2.6, 19.9, 4.3, 9.2];
-
     const prodYearsFull = Array.from({length: 2022-1979+1}, (_, i) => 1979 + i);
     const productivityCumulative = [0, 1.4, 2.3, 2.9, 5, 7.3, 9.4, 11.3, 13.7, 15.5, 17, 19.3, 21.5, 24.3, 26.8, 29.3, 31.5, 34, 36.8, 39.7, 42.5, 45.5, 48.6, 50.2, 53.2, 55.6, 58.3, 60.5, 62.4, 61.2, 64.9, 68.6, 71.3, 73.1, 74.5, 75.3, 76.8, 78.9, 81.3, 83.1, 85.2, 87, 88.7, 90.1];
     const payCumulative = [0, -0.4, -0.9, -1, 0.3, 1.3, 2.2, 2.6, 3, 2.5, 2.1, 2.6, 3.3, 3.8, 4.1, 5, 6.7, 8.4, 10.9, 13.5, 16.8, 19.9, 21.3, 22.5, 23.3, 24.2, 25, 25.4, 25, 24.5, 26, 26.6, 27.2, 27.9, 28.5, 29.3, 30.6, 31.9, 33.7, 35.1, 37, 36.4, 35.8, 36.5];
