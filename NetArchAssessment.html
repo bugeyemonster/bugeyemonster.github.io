@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Architecture Assessment Playbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Cool Neutrals -->
+    <!-- Application Structure Plan: The SPA is structured as a multi-phase playbook (Prep, Info Gathering, Analysis, Reporting, Tools) using a main navigation bar. This breaks the complex assessment process into logical, manageable steps. Users can navigate non-linearly. The core of the app is the Analysis phase, which splits top-level (core network) and low-level (departmental) reviews, using interactive elements like conceptual diagrams and a dynamic chart to illustrate analytical concepts. This structure is more intuitive for learning and reference than a single long document. -->
+    <!-- Visualization & Content Choices: 1. Core Architecture Diagram (HTML/CSS): Goal: Organize/Inform. A simple visual of the hub-and-spoke model to anchor the user's mental model. Interaction: Hover effects on elements to provide context. Justification: A static diagram is sufficient and lightweight. 2. Departmental Risk Chart (Chart.js Bar Chart): Goal: Compare/Analyze. To demonstrate how to visualize and compare risk profiles across departments. Interaction: A dropdown menu filters the data shown for each department. Justification: Chart.js is perfect for this simple, dynamic comparison. 3. Checklists/Accordions (HTML/JS): Goal: Inform/Organize. To present detailed checks and questions in a compact, user-friendly way. Interaction: Click to expand/collapse. Justification: Prevents overwhelming the user with text. NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #f8fafc; 
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://rsms.me/inter/inter.css');
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white shadow-md sticky top-0 z-10">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <h1 class="text-3xl font-bold text-slate-900">Network Architecture Security Playbook</h1>
+                <p class="text-slate-600 mt-1">A step-by-step guide for non-interactive assessments.</p>
+            </div>
+        </header>
+
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <nav class="md:col-span-3">
+                    <div class="sticky top-24">
+                        <ul class="space-y-2" id="nav-menu">
+                            <li><button data-target="phase1" class="nav-button w-full text-left font-semibold p-3 rounded-lg bg-white shadow hover:bg-blue-500 hover:text-white">Phase 1: Preparation & Scoping</button></li>
+                            <li><button data-target="phase2" class="nav-button w-full text-left font-semibold p-3 rounded-lg bg-white shadow hover:bg-blue-500 hover:text-white">Phase 2: Information Gathering</button></li>
+                            <li><button data-target="phase3" class="nav-button w-full text-left font-semibold p-3 rounded-lg bg-white shadow hover:bg-blue-500 hover:text-white">Phase 3: Analysis</button></li>
+                            <li><button data-target="phase4" class="nav-button w-full text-left font-semibold p-3 rounded-lg bg-white shadow hover:bg-blue-500 hover:text-white">Phase 4: Synthesis & Reporting</button></li>
+                            <li><button data-target="phase5" class="nav-button w-full text-left font-semibold p-3 rounded-lg bg-white shadow hover:bg-blue-500 hover:text-white">Tools & Resources</button></li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <main class="md:col-span-9">
+                    <!-- Phase 1: Preparation & Scoping -->
+                    <section id="phase1" class="content-section space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-2xl font-bold mb-4">Phase 1: Preparation & Scoping</h2>
+                            <p class="mb-6 text-slate-600">This initial phase is critical for setting the foundation for a successful assessment. Proper preparation ensures you understand the objectives, constraints, and key areas of focus before diving into technical details. It's about asking the right questions to define the "what" and "why" of the engagement.</p>
+                            <ul class="space-y-4">
+                                <li class="flex items-start p-4 bg-slate-50 rounded-lg">
+                                    <span class="text-blue-500 font-bold text-xl mr-4">✓</span>
+                                    <div>
+                                        <h3 class="font-semibold">Define Clear Objectives & Scope</h3>
+                                        <p class="text-slate-600 text-sm">Confirm with stakeholders the exact goals. Is it to find architectural flaws, assess compliance, or evaluate readiness for a new system? Clearly document what is in-scope (e.g., core network, 6 departments) and out-of-scope (e.g., endpoints, cloud infrastructure).</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start p-4 bg-slate-50 rounded-lg">
+                                    <span class="text-blue-500 font-bold text-xl mr-4">✓</span>
+                                    <div>
+                                        <h3 class="font-semibold">Identify Key Stakeholders & Asset Owners</h3>
+                                        <p class="text-slate-600 text-sm">Create a list of contacts for each department and the central network team. Identify who owns the critical assets and who can provide architectural context. This is vital for scheduling interviews.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start p-4 bg-slate-50 rounded-lg">
+                                    <span class="text-blue-500 font-bold text-xl mr-4">✓</span>
+                                    <div>
+                                        <h3 class="font-semibold">Establish Assessment Framework</h3>
+                                        <p class="text-slate-600 text-sm">Choose a framework to guide your analysis. This could be based on NIST SP 800-53, ISO 27002, or a custom model focusing on defense-in-depth principles like segmentation, access control, and monitoring.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start p-4 bg-slate-50 rounded-lg">
+                                    <span class="text-blue-500 font-bold text-xl mr-4">✓</span>
+                                    <div>
+                                        <h3 class="font-semibold">Submit Initial Information Request</h3>
+                                        <p class="text-slate-600 text-sm">Send a formal request for all available documentation, configurations, and previous security reports. Be specific about what you need (see Phase 2 for details).</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Phase 2: Information Gathering -->
+                    <section id="phase2" class="content-section space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-2xl font-bold mb-4">Phase 2: Information Gathering</h2>
+                            <p class="mb-6 text-slate-600">This phase involves collecting the raw data for your analysis. Since documentation is poor, you will rely heavily on interviews and direct configuration review. The goal is to build your own understanding of the network architecture, asset criticality, and data flows.</p>
+                            
+                            <div class="space-y-4">
+                                <!-- Accordion Item 1 -->
+                                <div class="accordion-item bg-slate-50 rounded-lg">
+                                    <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                                        <span>1. Documentation & Report Review</span>
+                                        <span class="transform transition-transform duration-300">▼</span>
+                                    </button>
+                                    <div class="accordion-content px-4 pb-4">
+                                        <p class="mb-2 text-sm text-slate-600">Even if poor, collect everything available. Look for inconsistencies and outdated information. Cross-reference with interview notes.</p>
+                                        <ul class="list-disc list-inside text-sm space-y-1">
+                                            <li><strong>Network Diagrams:</strong> High-level and low-level. Note their age and accuracy.</li>
+                                            <li><strong>Asset Inventories:</strong> What are the critical assets in each department?</li>
+                                            <li><strong>Data Flow Diagrams:</strong> How is data supposed to move between departments?</li>
+                                            <li><strong>Firewall Rulebases:</strong> Often a good source of truth for intended connectivity.</li>
+                                            <li><strong>Nessus/Vulnerability Scans:</strong> Identify high-risk systems, open ports, and services that can inform your view of the network's attack surface.</li>
+                                            <li><strong>Previous Pen Test Reports:</strong> What were the past findings? Have they been remediated?</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Accordion Item 2 -->
+                                <div class="accordion-item bg-slate-50 rounded-lg">
+                                    <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                                        <span>2. Stakeholder Interviews</span>
+                                        <span class="transform transition-transform duration-300">▼</span>
+                                    </button>
+                                    <div class="accordion-content px-4 pb-4">
+                                        <p class="mb-2 text-sm text-slate-600">Interviews are your primary tool for filling in the gaps from documentation. Ask open-ended questions to understand intent and operational reality.</p>
+                                        <h4 class="font-semibold mt-2">Questions for Network Infrastructure Team:</h4>
+                                        <ul class="list-disc list-inside text-sm space-y-1 pl-4">
+                                            <li>"Can you walk me through the core network topology and how the departments connect?"</li>
+                                            <li>"What is the philosophy for segmentation between departments?"</li>
+                                            <li>"How is remote access managed? VPNs, jump boxes?"</li>
+                                            <li>"What monitoring and logging capabilities are in place at the core?"</li>
+                                        </ul>
+                                        <h4 class="font-semibold mt-2">Questions for Departmental Owners/Admins:</h4>
+                                        <ul class="list-disc list-inside text-sm space-y-1 pl-4">
+                                            <li>"What are the most critical systems in your network? What do they do?"</li>
+                                            <li>"What other departments or external services do your critical systems need to communicate with?"</li>
+                                            <li>"Can you describe the internal segmentation of your departmental network?"</li>
+                                            <li>"Who is responsible for patching and maintaining the systems here?"</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Accordion Item 3 -->
+                                <div class="accordion-item bg-slate-50 rounded-lg">
+                                    <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                                        <span>3. Configuration Review</span>
+                                        <span class="transform transition-transform duration-300">▼</span>
+                                    </button>
+                                    <div class="accordion-content px-4 pb-4">
+                                        <p class="mb-2 text-sm text-slate-600">This is where you find the ground truth. Manually review configs for routers, switches, and firewalls. Focus on security posture, not just functionality.</p>
+                                        <ul class="list-disc list-inside text-sm space-y-1">
+                                            <li><strong>Firewalls/Routers:</strong> Review ACLs. Look for "any/any" rules, overly permissive rules, and lack of egress filtering. Check NAT/PAT configurations.</li>
+                                            <li><strong>Switches:</strong> Check VLAN configurations. Are sensitive systems properly segregated? Look for insecure settings like disabled port security, lack of DHCP snooping, and open management interfaces.</li>
+                                            <li><strong>General Hardening:</strong> Are administrative services (SSH, Telnet, SNMP) secured? Are default credentials changed? Is logging configured to send to a central SIEM?</li>
+                                            <li><strong>Routing Protocols:</strong> Check for routing protocol authentication (e.g., OSPF, BGP). Is route filtering in place to prevent route leaks?</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Phase 3: Analysis -->
+                    <section id="phase3" class="content-section space-y-6">
+                         <div class="bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-2xl font-bold mb-4">Phase 3: Analysis</h2>
+                            <p class="mb-6 text-slate-600">In this phase, you synthesize the information gathered to identify architectural weaknesses. It's helpful to approach this from two perspectives: a top-down view of the overall architecture and a bottom-up view of the individual departmental networks.</p>
+
+                            <h3 class="text-xl font-semibold mb-4 border-b pb-2">Top-Down: Core Architecture Analysis</h3>
+                            <p class="mb-4 text-slate-600">Focus on how the network is structured as a whole. How are trust boundaries enforced between the departments and between the internal network and the outside world?</p>
+                            
+                            <div class="w-full p-4 bg-slate-50 rounded-lg mb-6">
+                                <h4 class="font-bold text-center mb-4">Conceptual Hub-and-Spoke Model</h4>
+                                <div class="flex justify-center items-center">
+                                    <div class="grid grid-cols-3 grid-rows-3 gap-4 items-center">
+                                        <div class="bg-slate-200 p-2 text-center rounded shadow col-start-1 row-start-1">Dept 1</div>
+                                        <div class="bg-slate-200 p-2 text-center rounded shadow col-start-1 row-start-2">Dept 2</div>
+                                        <div class="bg-slate-200 p-2 text-center rounded shadow col-start-1 row-start-3">Dept 3</div>
+                                        
+                                        <div class="relative col-start-2 row-span-3 flex justify-center items-center">
+                                            <div class="absolute w-px h-full bg-slate-400 top-0"></div>
+                                            <div class="absolute h-px w-full bg-slate-400 left-0"></div>
+                                            <div class="bg-blue-500 text-white p-4 rounded-full shadow-lg z-10">Core Infra</div>
+                                        </div>
+
+                                        <div class="bg-slate-200 p-2 text-center rounded shadow col-start-3 row-start-1">Dept 4</div>
+                                        <div class="bg-slate-200 p-2 text-center rounded shadow col-start-3 row-start-2">Dept 5</div>
+                                        <div class="bg-slate-200 p-2 text-center rounded shadow col-start-3 row-start-3">Dept 6</div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-center mt-2 text-slate-500">Lines represent logical connections, not physical ones. The key question is what controls exist on these connections.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="border p-4 rounded-lg bg-slate-50">
+                                    <h4 class="font-semibold">Perimeter Security</h4>
+                                    <p class="text-sm text-slate-600">Is there a clear perimeter with dedicated firewalls? Is ingress/egress filtering enforced? How is the DMZ architected?</p>
+                                </div>
+                                <div class="border p-4 rounded-lg bg-slate-50">
+                                    <h4 class="font-semibold">Inter-Department Segmentation</h4>
+                                    <p class="text-sm text-slate-600">Is traffic between departments inspected (firewalled) or just routed? The ideal is a zero-trust approach where all inter-VLAN traffic is denied by default.</p>
+                                </div>
+                                <div class="border p-4 rounded-lg bg-slate-50">
+                                    <h4 class="font-semibold">Centralized Services</h4>
+                                    <p class="text-sm text-slate-600">How are services like DNS, NTP, and Authentication (AD/RADIUS) architected? Are they resilient? Are they a single point of failure?</p>
+                                </div>
+                                <div class="border p-4 rounded-lg bg-slate-50">
+                                    <h4 class="font-semibold">Redundancy & Resiliency</h4>
+                                    <p class="text-sm text-slate-600">Are core components (routers, firewalls) redundant (e.g., using HSRP/VRRP)? What happens if a core link fails?</p>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-xl font-semibold mb-4 mt-8 border-b pb-2">Bottom-Up: Departmental Network Analysis</h3>
+                             <p class="mb-4 text-slate-600">Analyze each department's internal network as its own entity. A weakness in one department can compromise the entire organization if segmentation is poor.</p>
+                            
+                            <div class="bg-slate-50 p-4 rounded-lg">
+                                <div class="flex items-center mb-4">
+                                    <label for="department-select" class="font-semibold mr-2">View Hypothetical Risk Profile for:</label>
+                                    <select id="department-select" class="p-2 border rounded-md shadow-sm">
+                                        <option value="0">Department 1 (IT)</option>
+                                        <option value="1">Department 2 (Finance)</option>
+                                        <option value="2">Department 3 (HR)</option>
+                                        <option value="3">Department 4 (Operations - OT)</option>
+                                        <option value="4">Department 5 (R&D)</option>
+                                        <option value="5">Department 6 (Legal)</option>
+                                    </select>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="departmentalRiskChart"></canvas>
+                                </div>
+                                <p class="text-xs text-center mt-2 text-slate-500">This chart is a conceptual tool. Your goal is to build a similar risk profile for each department based on your findings in key areas.</p>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Phase 4: Synthesis & Reporting -->
+                    <section id="phase4" class="content-section space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                             <h2 class="text-2xl font-bold mb-4">Phase 4: Synthesis & Reporting</h2>
+                            <p class="mb-6 text-slate-600">The final phase involves consolidating your findings into a coherent narrative. The report should be clear, concise, and actionable. Your audience ranges from technical staff to management, so structure it accordingly.</p>
+
+                            <h3 class="font-semibold mb-2">Report Structure</h3>
+                            <ul class="space-y-3">
+                                <li class="p-3 bg-slate-50 rounded-lg">
+                                    <strong>1. Executive Summary:</strong> A high-level overview for management. Summarize the key architectural risks and their potential business impact. Avoid technical jargon.
+                                </li>
+                                <li class="p-3 bg-slate-50 rounded-lg">
+                                    <strong>2. Scope & Methodology:</strong> Briefly describe what was assessed and the methods used (document review, interviews, config analysis). State the "non-interactive" constraint clearly.
+                                </li>
+                                <li class="p-3 bg-slate-50 rounded-lg">
+                                    <strong>3. Strengths:</strong> Start on a positive note. What is the organization doing well? (e.g., "The use of redundant core routers provides good resiliency.")
+                                </li>
+                                <li class="p-3 bg-slate-50 rounded-lg">
+                                    <strong>4. Findings & Recommendations:</strong> This is the core of the report. Group findings by theme (e.g., Segmentation, Access Control) or by risk level. Each finding should have:
+                                    <ul class="list-disc list-inside mt-2 ml-4 text-sm text-slate-700">
+                                        <li>A clear title.</li>
+                                        <li>A description of the weakness.</li>
+                                        <li>The associated risk and business impact.</li>
+                                        <li>A concrete, actionable recommendation.</li>
+                                    </ul>
+                                </li>
+                                <li class="p-3 bg-slate-50 rounded-lg">
+                                    <strong>5. Appendices:</strong> Include supporting evidence, such as sanitized configuration snippets or a list of interviewees (with their permission).
+                                </li>
+                            </ul>
+
+                            <h3 class="font-semibold mt-6 mb-2">Example Finding</h3>
+                            <div class="border-l-4 border-blue-500 pl-4 py-2 bg-slate-50 rounded-r-lg">
+                                <h4 class="font-bold">Finding: Insufficient Inter-Departmental Segmentation</h4>
+                                <p class="text-slate-700 mt-1"><strong>Observation:</strong> Network traffic between the Finance (Dept 2) and R&D (Dept 5) VLANs is not inspected by a firewall. The core router is configured to route traffic directly between these segments.</p>
+                                <p class="text-slate-700 mt-1"><strong>Risk:</strong> A compromise within the R&D network, which may have less stringent security controls, could directly pivot to critical financial systems. This lack of a trust boundary significantly increases the lateral movement attack surface.</p>
+                                <p class="text-slate-700 mt-1"><strong>Recommendation:</strong> Re-architect the core network to route all inter-departmental traffic through a stateful firewall. Implement a default-deny policy and create explicit rules to only allow required business traffic between departments.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Phase 5: Tools & Resources -->
+                    <section id="phase5" class="content-section space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-2xl font-bold mb-4">Tools & Resources</h2>
+                            <p class="mb-6 text-slate-600">While this is a non-interactive assessment, several open-source tools can significantly help you visualize, analyze, and manage the information you collect. These tools focus on processing the data you've been given, not on actively scanning the network.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-slate-50 rounded-lg border">
+                                    <h3 class="font-semibold">draw.io (diagrams.net)</h3>
+                                    <p class="text-sm text-slate-600"><strong>Use Case:</strong> Network Visualization.<br>Essential for creating your own network diagrams as you understand the architecture. Don't trust the provided diagrams; build your own version based on configs and interviews. This process often reveals architectural flaws.</p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-lg border">
+                                    <h3 class="font-semibold">Nipper</h3>
+                                    <p class="text-sm text-slate-600"><strong>Use Case:</strong> Automated Configuration Auditing.<br>While not open-source for the full version, there are community editions or similar tools. Nipper can parse device configurations (firewalls, routers, switches) and automatically report on hardening issues, risky firewall rules, and vulnerabilities.</p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-lg border">
+                                    <h3 class="font-semibold">Batfish</h3>
+                                    <p class="text-sm text-slate-600"><strong>Use Case:</strong> Network Configuration Analysis.<br>An advanced, powerful open-source tool. You feed it all your network device configurations, and it builds a model of the network. You can then query this model to find out things like "Can Host A talk to Host B?", "What would be the impact of this firewall rule change?", or find unused ACLs.</p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-lg border">
+                                    <h3 class="font-semibold">NetBox</h3>
+                                    <p class="text-sm text-slate-600"><strong>Use Case:</strong> IPAM & DCIM.<br>While primarily an "Infrastructure Resource Modeling" tool, it can be invaluable for organizing your findings. You can model the network structure, IP ranges, VLANs, and devices as you discover them. This creates a structured inventory that can be a valuable deliverable for the client.</p>
+                                </div>
+                                 <div class="p-4 bg-slate-50 rounded-lg border">
+                                    <h3 class="font-semibold">Obsidian / Joplin</h3>
+                                    <p class="text-sm text-slate-600"><strong>Use Case:</strong> Note Taking & Knowledge Management.<br>Use a powerful note-taking app to link your interview notes, configuration snippets, and findings together. Being able to quickly cross-reference information is key to identifying inconsistencies.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <footer class="bg-white mt-auto">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-slate-500 text-sm">
+                <p>This playbook is a guide. Adapt its principles to the specific context of your assessment.</p>
+            </div>
+        </footer>
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navButtons = document.querySelectorAll('.nav-button');
+    const contentSections = document.querySelectorAll('.content-section');
+    const accordions = document.querySelectorAll('.accordion-item');
+    
+    function showSection(targetId) {
+        contentSections.forEach(section => {
+            section.classList.toggle('active', section.id === targetId);
+        });
+        navButtons.forEach(button => {
+            button.classList.toggle('active', button.dataset.target === targetId);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            showSection(button.dataset.target);
+        });
+    });
+
+    accordions.forEach(item => {
+        const header = item.querySelector('.accordion-header');
+        const content = item.querySelector('.accordion-content');
+        const icon = header.querySelector('span:last-child');
+        header.addEventListener('click', () => {
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        });
+    });
+
+    showSection('phase1');
+
+    const departmentalData = [
+        { name: 'Dept 1 (IT)', scores: [3, 2, 4, 2, 3] },
+        { name: 'Dept 2 (Finance)', scores: [2, 1, 2, 1, 2] },
+        { name: 'Dept 3 (HR)', scores: [3, 2, 3, 3, 3] },
+        { name: 'Dept 4 (Operations - OT)', scores: [5, 5, 4, 3, 4] },
+        { name: 'Dept 5 (R&D)', scores: [4, 4, 5, 4, 5] },
+        { name: 'Dept 6 (Legal)', scores: [2, 2, 2, 1, 1] }
+    ];
+
+    const chartLabels = ['Vulnerability Mgmt', 'Internal Segmentation', 'Device Hardening', 'Access Control', 'Data Protection'];
+    const ctx = document.getElementById('departmentalRiskChart').getContext('2d');
+    
+    let riskChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Hypothetical Risk Score (1=Low, 5=High)',
+                data: departmentalData[0].scores,
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    title: {
+                        display: true,
+                        text: 'Risk Score'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Risk Profile for Department 1 (IT)',
+                    font: {
+                        size: 16
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    const departmentSelect = document.getElementById('department-select');
+    departmentSelect.addEventListener('change', (e) => {
+        const selectedIndex = e.target.value;
+        const selectedData = departmentalData[selectedIndex];
+        riskChart.data.datasets[0].data = selectedData.scores;
+        riskChart.options.plugins.title.text = `Risk Profile for ${selectedData.name}`;
+        riskChart.update();
+    });
+});
+</script>
+</body>
+</html>
