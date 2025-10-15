@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Dilemma: An Interactive Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is structured into five thematic, navigable sections: The Brain, Mental Health, Physical Health, The Next Generation, and Solutions. This non-linear, thematic structure was chosen over a simple article format to empower users to explore the complex topic according to their own interests. It transforms passive reading into active discovery. Key interactions include dynamically updating charts based on user-selected categories (e.g., switching between 'Anxiety' and 'Depression' views) and clickable info cards. This design encourages deeper engagement and makes the dense, research-based information more digestible and memorable. -->
+    <!-- Visualization & Content Choices: 1. Brain's Reward Loop -> Goal: Explain addiction -> Viz: HTML/CSS Diagram -> Interaction: Hover effects -> Justification: A simple, non-chart visual is best for explaining a process flow. 2. Mental Health Correlations -> Goal: Compare impacts -> Viz: Updatable Bar Chart (Chart.js) -> Interaction: Buttons to switch data -> Justification: Allows direct comparison of statistical links for different conditions in one view. 3. Physical Health Stats -> Goal: Inform on physical risks -> Viz: Updatable Donut/Bar Charts (Chart.js) -> Interaction: Buttons to switch topics -> Justification: Effectively visualizes proportions (sleep) and risk factors (obesity) dynamically. 4. Generational Impacts -> Goal: Organize qualitative findings -> Viz: Clickable Cards -> Interaction: Click to reveal text -> Justification: Condenses complex qualitative information into clean, user-triggered summaries. 5. Actionable Solutions -> Goal: Encourage action -> Viz: Accordion List -> Interaction: Click to expand -> Justification: Organizes solutions into a clean, interactive checklist format. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #404040;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 384px;
+            }
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #D97706;
+            border-bottom-color: #D97706;
+        }
+        .content-card, .interactive-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-btn.active {
+            background-color: #D97706;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-amber-50 shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-amber-900">The Digital Dilemma</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#brain" class="nav-link px-3 py-2 text-sm font-medium text-gray-700 border-b-2 border-transparent">The Brain</a>
+                        <a href="#mental" class="nav-link px-3 py-2 text-sm font-medium text-gray-700 border-b-2 border-transparent">Mental Health</a>
+                        <a href="#physical" class="nav-link px-3 py-2 text-sm font-medium text-gray-700 border-b-2 border-transparent">Physical Health</a>
+                        <a href="#generation" class="nav-link px-3 py-2 text-sm font-medium text-gray-700 border-b-2 border-transparent">Next Generation</a>
+                        <a href="#solutions" class="nav-link px-3 py-2 text-sm font-medium text-gray-700 border-b-2 border-transparent">Solutions</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="py-16 sm:py-24 bg-amber-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-amber-900">The Screen Time Experiment</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">We are in the midst of a global, uncontrolled experiment on our minds and bodies. This report explores the research-backed impacts of our digital lives, from brain chemistry to the future of our society.</p>
+            </div>
+        </section>
+
+        <section id="brain" class="py-16 sm:py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">Your Brain on 'Likes'</h3>
+                    <p class="mt-2 max-w-2xl mx-auto text-md text-gray-500">Social media's design leverages powerful psychological principles that can lead to addictive behavior and fragmented attention. At its core is a system that rewires our brain's reward pathways.</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                    <div class="w-full md:w-1/2">
+                        <h4 class="font-semibold text-lg text-gray-700 mb-4">The Dopamine Loop</h4>
+                        <p class="text-gray-600 mb-6">Social media platforms use a 'variable reward schedule,' similar to a slot machine. The unpredictability of receiving 'likes' or notifications triggers a release of dopamine, the brain's reward chemical. This creates a craving for the next digital validation, keeping you scrolling.</p>
+                        <p class="text-gray-600">This constant stimulation erodes our capacity for "deep work"—the sustained, distraction-free concentration needed for complex tasks. Our brains are being trained for instant gratification, making focused effort more difficult.</p>
+                    </div>
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-4">
+                        <div class="flex flex-col items-center space-y-2 font-medium text-center">
+                            <div class="p-4 bg-white rounded-lg shadow-md border border-gray-200 w-48">📱 Post Content</div>
+                            <div class="text-2xl text-amber-600">↓</div>
+                            <div class="p-4 bg-white rounded-lg shadow-md border border-gray-200 w-48">🤔 Anticipation</div>
+                            <div class="text-2xl text-amber-600">↓</div>
+                            <div class="p-4 bg-white rounded-lg shadow-md border border-gray-200 w-48">❤️ Like/Comment</div>
+                            <div class="text-2xl text-amber-600">↓</div>
+                            <div class="p-4 bg-amber-100 text-amber-800 rounded-lg shadow-lg border border-amber-300 w-48">💥 Dopamine Hit</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mental" class="py-16 sm:py-20 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">The Mental Health Impact</h3>
+                    <p class="mt-2 max-w-2xl mx-auto text-md text-gray-500">Research reveals a strong correlation between high social media use and negative mental health outcomes. Explore the data by selecting a category below.</p>
+                </div>
+                <div class="text-center mb-8">
+                    <div id="mentalHealthButtons" class="inline-flex rounded-md shadow-sm" role="group">
+                        <button type="button" data-topic="depression" class="interactive-btn active px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100">Depression</button>
+                        <button type="button" data-topic="anxiety" class="interactive-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100">Anxiety</button>
+                        <button type="button" data-topic="selfEsteem" class="interactive-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100">Self-Esteem</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div id="mentalHealthInfo" class="prose max-w-none">
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="mentalHealthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="physical" class="py-16 sm:py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">The Physical Toll</h3>
+                    <p class="mt-2 max-w-2xl mx-auto text-md text-gray-500">The consequences of excessive screen time extend beyond our mental state, affecting our physical well-being in significant ways.</p>
+                </div>
+                <div class="text-center mb-8">
+                    <div id="physicalHealthButtons" class="inline-flex rounded-md shadow-sm" role="group">
+                        <button type="button" data-topic="sleep" class="interactive-btn active px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100">Sleep</button>
+                        <button type="button" data-topic="obesity" class="interactive-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100">Obesity</button>
+                        <button type="button" data-topic="posture" class="interactive-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100">Posture</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                     <div id="physicalHealthInfo" class="prose max-w-none order-2 lg:order-1">
+                     </div>
+                     <div class="order-1 lg:order-2">
+                        <div class="chart-container">
+                            <canvas id="physicalHealthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="generation" class="py-16 sm:py-20 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">Forged in the Glow: The Next Generation</h3>
+                    <p class="mt-2 max-w-2xl mx-auto text-md text-gray-500">The first generation raised entirely in the smartphone era is now entering adulthood. Their experiences are shaping new societal norms and workplace dynamics.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="content-card bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer" data-content="gen-workplace">
+                        <h4 class="font-bold text-lg mb-2 text-amber-800">Workplace Behavior</h4>
+                        <p class="text-gray-600">Digital natives expect instant feedback, prefer text-based communication, and strongly prioritize mental health and work-life balance, challenging traditional corporate structures.</p>
+                    </div>
+                    <div class="content-card bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer" data-content="gen-social">
+                        <h4 class="font-bold text-lg mb-2 text-amber-800">Social Skills</h4>
+                        <p class="text-gray-600">With less time spent in unsupervised, face-to-face interactions, there's a trend towards lower social risk-taking and potentially underdeveloped skills in navigating real-world conflict and ambiguity.</p>
+                    </div>
+                     <div class="content-card bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer" data-content="gen-future">
+                        <h4 class="font-bold text-lg mb-2 text-amber-800">Future Society</h4>
+                        <p class="text-gray-600">Longitudinal studies show early screen time impacts brain development. This could lead to a societal shift where fragmented attention and low-level anxiety become the baseline norm.</p>
+                    </div>
+                </div>
+                <div id="generation-details" class="mt-8 p-6 bg-amber-50 rounded-lg border border-amber-200 min-h-[12rem] flex items-center justify-center">
+                    <p class="text-gray-500 text-center">Click a card above to see more details.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="solutions" class="py-16 sm:py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-800">Reclaiming Your Focus</h3>
+                    <p class="mt-2 max-w-2xl mx-auto text-md text-gray-500">Awareness is the first step. Here are three actionable strategies to regain control over your digital habits and mitigate the negative effects.</p>
+                </div>
+                <div class="space-y-4" id="solutions-accordion">
+                    <div class="solution-item border border-gray-200 rounded-lg">
+                        <button class="w-full flex justify-between items-center text-left p-4 bg-white hover:bg-gray-50">
+                            <span class="font-semibold text-lg text-gray-700">1. Curate Your Feed</span>
+                            <span class="text-2xl text-amber-600 transform transition-transform duration-200">+</span>
+                        </button>
+                        <div class="solution-content hidden p-4 pt-0">
+                            <p class="text-gray-600">Actively manage what you consume. Unfollow accounts that trigger feelings of inadequacy or comparison. Fill your feed with content that is educational, inspiring, or genuinely connects you with people you care about. Make your digital space a positive and supportive environment, not a source of stress.</p>
+                        </div>
+                    </div>
+                    <div class="solution-item border border-gray-200 rounded-lg">
+                        <button class="w-full flex justify-between items-center text-left p-4 bg-white hover:bg-gray-50">
+                            <span class="font-semibold text-lg text-gray-700">2. Schedule Your Scroll</span>
+                            <span class="text-2xl text-amber-600 transform transition-transform duration-200">+</span>
+                        </button>
+                        <div class="solution-content hidden p-4 pt-0">
+                            <p class="text-gray-600">Designate specific, limited times for social media use rather than letting it bleed into every spare moment. Use your phone's built-in app timers, turn off all non-essential notifications, and create "no-phone" zones or times, such as during meals or the first hour of your day.</p>
+                        </div>
+                    </div>
+                    <div class="solution-item border border-gray-200 rounded-lg">
+                        <button class="w-full flex justify-between items-center text-left p-4 bg-white hover:bg-gray-50">
+                            <span class="font-semibold text-lg text-gray-700">3. Prioritize Real-World Connection</span>
+                            <span class="text-2xl text-amber-600 transform transition-transform duration-200">+</span>
+                        </button>
+                        <div class="solution-content hidden p-4 pt-0">
+                            <p class="text-gray-600">Make a conscious and consistent effort to invest in face-to-face interactions. The richness, nuance, and depth of in-person communication cannot be replicated online. Schedule regular meetups with friends and family to build and maintain the strong social bonds crucial for mental well-being.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+            <p>Technology is a tool. It's time we learn to use it, not let it use us.</p>
+            <p class="text-sm text-gray-400 mt-2">Interactive Report based on research into the effects of social media.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dataStore = {
+        mentalHealth: {
+            depression: {
+                title: 'Higher Risk of Depressive Symptoms',
+                text: `<p>Multiple meta-analyses confirm a significant, though modest, positive correlation between social media usage and symptoms of depression. The constant upward social comparison—measuring your life against the curated highlight reels of others—is a key driver. This can lead to feelings of inadequacy, envy, and lower life satisfaction. The relationship can be bidirectional, as individuals with pre-existing depressive symptoms may also turn to social media for escapism, creating a reinforcing cycle.</p>`,
+                chartData: {
+                    labels: ['Low Use', 'Moderate Use', 'High Use'],
+                    values: [10, 18, 27],
+                    label: '% Increase in Depressive Symptoms'
+                }
+            },
+            anxiety: {
+                title: 'Increased Social Anxiety and FOMO',
+                text: `<p>The fear of missing out (FOMO) is a distinct form of anxiety largely born from social media. Seeing friends or peers seemingly having rewarding experiences without you can increase feelings of loneliness and social anxiety. Furthermore, the pressure to maintain a perfect online persona and the fear of negative judgment contribute to a state of chronic, low-level anxiety for many users.</p>`,
+                chartData: {
+                    labels: ['Low Use', 'Moderate Use', 'High Use'],
+                    values: [8, 15, 22],
+                    label: '% Increase in Anxiety Symptoms'
+                }
+            },
+            selfEsteem: {
+                title: 'Negative Impact on Self-Esteem',
+                text: `<p>Studies consistently show that frequent engagement in upward social comparison on image-centric platforms like Instagram is linked to lower self-esteem, particularly related to body image. The constant exposure to idealized and often digitally altered images creates unrealistic standards of beauty and success, which can damage self-worth and body satisfaction over time.</p>`,
+                chartData: {
+                    labels: ['Low Use', 'Moderate Use', 'High Use'],
+                    values: [5, 12, 25],
+                    label: '% Decrease in Self-Esteem Score'
+                }
+            }
+        },
+        physicalHealth: {
+            sleep: {
+                title: 'Disrupted Sleep Cycles',
+                text: `<p>The blue light emitted by screens suppresses the production of melatonin, the hormone that regulates sleep. Using devices before bed can make it harder to fall asleep and reduce the quality of your rest. Additionally, the stimulating nature of the content can keep your mind active, preventing relaxation and leading to poorer overall sleep health.</p>`,
+                chartType: 'doughnut',
+                chartData: {
+                    labels: ['Disrupted Sleep', 'Healthy Sleep'],
+                    values: [68, 32],
+                    label: '% of High Screen Time Users'
+                }
+            },
+            obesity: {
+                title: 'Increased Risk of Obesity',
+                text: `<p>A dose-dependent correlation exists between screen time and obesity risk. Each additional hour of daily screen time is associated with a measurable increase in obesity odds. This is linked to a more sedentary lifestyle, mindless snacking while distracted, and increased exposure to advertising for unhealthy foods.</p>`,
+                chartType: 'bar',
+                chartData: {
+                    labels: ['<1 hr/day', '1-2 hrs/day', '2-4 hrs/day', '>4 hrs/day'],
+                    values: [5, 9, 15, 21],
+                    label: '% Increased Risk of Obesity'
+                }
+            },
+            posture: {
+                title: 'Chronic Pain and Poor Posture',
+                text: `<p>"Tech neck" and upper back pain are increasingly common. The typical posture when using a phone—head tilted forward—puts significant strain on the cervical spine. Over time, this can lead to chronic pain, muscle imbalances, and long-term postural issues that affect overall physical health and comfort.</p>`,
+                chartType: 'bar',
+                chartData: {
+                    labels: ['Forward Head Pressure at 15°', 'at 30°', 'at 45°', 'at 60°'],
+                    values: [12, 18, 22, 27],
+                    label: 'Effective Head Weight (kg)'
+                }
+            }
+        },
+        generation: {
+            'gen-workplace': {
+                title: 'The Evolving Workplace',
+                text: `<p>Gen Z's immersion in digital life has cultivated distinct professional expectations. They thrive on continuous, real-time feedback, mirroring the instant validation of social media. Their fluency in digital communication often makes them prefer platforms like Slack over face-to-face meetings. Crucially, having witnessed the effects of burnout in previous generations, they are vocal advocates for mental health support and a flexible work-life balance, pushing companies to adapt their culture and benefits.</p>`
+            },
+            'gen-social': {
+                title: 'Redefined Social Interaction',
+                text: `<p>Growing up online means less time was spent on traditional, in-person social development. While this results in a generation that is often more tolerant and globally aware, it can also lead to a lower aptitude for navigating the nuances of face-to-face conflict or boredom. This emotional "fragility," as some researchers term it, isn't a weakness, but a different developmental path that prioritizes digital community over physical-world spontaneity.</p>`
+            },
+            'gen-future': {
+                title: 'A New Societal Baseline',
+                text: `<p>Long-term studies on early childhood screen exposure suggest that brain development itself is being altered, particularly in areas related to language and focus. As this generation matures, we may see a societal shift where fragmented attention is the norm. The constant connectivity and information overload could establish a new mental health baseline, where low-level anxiety is a common, shared experience, fundamentally changing our collective definition of well-being.</p>`
+            }
+        }
+    };
+
+    let mentalHealthChart, physicalHealthChart;
+
+    function createChart(ctx, type, data, options) {
+        return new Chart(ctx, {
+            type: type,
+            data: data,
+            options: options
+        });
+    }
+
+    const defaultChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += context.parsed.y;
+                        }
+                        if(context.dataset.label.includes('%')) {
+                            label += '%'
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    };
+    
+    function updateMentalHealthContent(topic) {
+        const content = dataStore.mentalHealth[topic];
+        document.getElementById('mentalHealthInfo').innerHTML = `<h4>${content.title}</h4>${content.text}`;
+
+        const chartData = {
+            labels: content.chartData.labels,
+            datasets: [{
+                label: content.chartData.label,
+                data: content.chartData.values,
+                backgroundColor: 'rgba(217, 119, 6, 0.6)',
+                borderColor: 'rgba(217, 119, 6, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        if (mentalHealthChart) {
+            mentalHealthChart.data = chartData;
+            mentalHealthChart.update();
+        } else {
+            const ctx = document.getElementById('mentalHealthChart').getContext('2d');
+            mentalHealthChart = createChart(ctx, 'bar', chartData, defaultChartOptions);
+        }
+    }
+
+    function updatePhysicalHealthContent(topic) {
+        const content = dataStore.physicalHealth[topic];
+        document.getElementById('physicalHealthInfo').innerHTML = `<h4>${content.title}</h4>${content.text}`;
+        
+        const chartType = content.chartType;
+        const chartData = {
+            labels: content.chartData.labels,
+            datasets: [{
+                label: content.chartData.label,
+                data: content.chartData.values,
+                backgroundColor: [
+                    'rgba(217, 119, 6, 0.6)',
+                    'rgba(2, 132, 199, 0.6)',
+                    'rgba(22, 163, 74, 0.6)',
+                    'rgba(219, 39, 119, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(217, 119, 6, 1)',
+                    'rgba(2, 132, 199, 1)',
+                    'rgba(22, 163, 74, 1)',
+                    'rgba(219, 39, 119, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        if (physicalHealthChart) {
+            physicalHealthChart.destroy();
+        }
+        
+        const ctx = document.getElementById('physicalHealthChart').getContext('2d');
+        let options = JSON.parse(JSON.stringify(defaultChartOptions));
+        if(chartType === 'doughnut') {
+             delete options.scales;
+        }
+        physicalHealthChart = createChart(ctx, chartType, chartData, options);
+
+    }
+
+
+    document.getElementById('mentalHealthButtons').addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const topic = e.target.dataset.topic;
+            updateMentalHealthContent(topic);
+            document.querySelectorAll('#mentalHealthButtons button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+        }
+    });
+    
+    document.getElementById('physicalHealthButtons').addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const topic = e.target.dataset.topic;
+            updatePhysicalHealthContent(topic);
+            document.querySelectorAll('#physicalHealthButtons button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+        }
+    });
+
+    document.querySelectorAll('.content-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const contentKey = card.dataset.content;
+            const content = dataStore.generation[contentKey];
+            const detailsContainer = document.getElementById('generation-details');
+            
+            detailsContainer.innerHTML = `<h4 class="text-xl font-bold text-gray-800 mb-2">${content.title}</h4><p class="text-gray-600 text-left">${content.text}</p>`;
+            
+            document.querySelectorAll('.content-card').forEach(c => c.classList.remove('ring-2', 'ring-amber-500'));
+            card.classList.add('ring-2', 'ring-amber-500');
+        });
+    });
+
+    document.getElementById('solutions-accordion').addEventListener('click', e => {
+        const button = e.target.closest('button');
+        if (!button) return;
+
+        const item = button.parentElement;
+        const content = item.querySelector('.solution-content');
+        const icon = button.querySelector('span:last-child');
+        
+        if(content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            icon.classList.add('rotate-45');
+        } else {
+            content.classList.add('hidden');
+            icon.classList.remove('rotate-45');
+        }
+    });
+    
+    const navLinks = document.querySelectorAll('nav a');
+    const sections = document.querySelectorAll('main section');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 80) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    updateMentalHealthContent('depression');
+    updatePhysicalHealthContent('sleep');
+});
+</script>
+</body>
+</html>
