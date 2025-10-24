@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-R">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LETVIS Security Assessment Plan Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Neutral Gray and Blue -->
+    <!-- Application Structure Plan: The SPA is structured using a main tabbed navigation to break the dense, linear report into logical, thematic sections: 'Overview' (Scope, Standards), 'Execution Plan' (Timeline), 'Methods & Tools' (Data Collection, Interviews), 'Focus Areas' (Playbooks), 'Identified Gaps' (Omissions), and 'Risk & Outcomes' (Matrix, Recommendations). This non-linear, thematic structure was chosen because it allows a user to explore the plan based on their immediate question (e.g., "What's the timeline?", "What tools?"), which is more user-friendly than the original report's 8-chapter flow. Key interactions include the main tab navigation, an interactive Chart.js Gantt-style chart for the 8-day plan, and sub-tabs for the 'Focus Areas' playbooks. -->
+    <!-- Visualization & Content Choices: 
+    1. Report Info: 8-Day Assessment Plan (Sec III.A). Goal: Visualize the 8-day, 2-assessor timeline. Viz/Method: Horizontal Stacked Bar Chart (simulating a Gantt chart). Interaction: Tooltip on hover shows detailed tasks for each assessor on that day. Justification: Provides a high-level, at-a-glance overview of the 8-day effort and resource allocation, which is more intuitive than the text table alone. Library: Chart.js.
+    2. Report Info: System Scope (Sec I.A). Goal: Show in-scope components. Viz/Method: Styled HTML/Tailwind 'flow diagram' (divs and arrows). Interaction: None. Justification: More visually engaging than a simple bullet list, clarifying the system components. Library: HTML/Tailwind.
+    3. Report Info: System Playbooks (Sec VI). Goal: Organize three dense, related text blocks. Viz/Method: Internal tabbed interface. Interaction: Click tabs to show/hide playbook content. Justification: Prevents a long, scrolling page and allows for easy comparison between the playbooks. Library: Vanilla JS.
+    4. Report Info: Risk Matrix (Sec VIII.A). Goal: Display risk criteria. Viz/Method: Styled HTML table. Interaction: None. Justification: A table is the clearest, most direct way to present matrix data. Library: HTML/Tailwind.
+    5. Report Info: Interview Questions (Sec IV). Goal: Condense a long list of questions. Viz/Method: HTML <details> accordion. Interaction: Click to expand/collapse. Justification: Hides dense content by default, improving readability. Library: HTML.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+                max-height: 350px;
+            }
+        }
+        .nav-tab {
+            padding: 0.75rem 1rem;
+            margin-bottom: -1px;
+            border: 1px solid transparent;
+            border-top-left-radius: 0.375rem;
+            border-top-right-radius: 0.375rem;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .nav-tab:hover {
+            color: #1f2937;
+            border-color: #e5e7eb;
+        }
+        .nav-tab.active-tab {
+            color: #1d4ed8;
+            font-weight: 600;
+            border-color: #d1d5db #d1d5db #f9fafb;
+        }
+        .sub-tab {
+            padding: 0.5rem 1rem;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s ease-in-out;
+        }
+        .sub-tab:hover {
+            color: #1f2937;
+        }
+        .sub-tab.active-sub-tab {
+            color: #1d4ed8;
+            border-bottom-color: #1d4ed8;
+        }
+        .content-section {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 text-neutral-800 font-sans leading-relaxed">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-800 mb-2">Expert Security Assessment Plan</h1>
+            <p class="text-xl text-neutral-600">LETVIS Air Traffic Management System</p>
+        </header>
+
+        <nav class="mb-6">
+            <ul class="flex flex-wrap border-b border-neutral-300">
+                <li><button class="nav-tab active-tab" data-target="overview">Overview & Foundation</button></li>
+                <li><button class="nav-tab" data-target="plan">Execution Plan</button></li>
+                <li><button class="nav-tab" data-target="methods">Methods & Tools</button></li>
+                <li><button class="nav-tab" data-target="focus">Focus Areas (Playbooks)</button></li>
+                <li><button class="nav-tab" data-target="gaps">Identified Gaps</button></li>
+                <li><button class="nav-tab" data-target="outcomes">Risk & Outcomes</button></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- Section 1: Overview & Foundation -->
+            <section id="overview" class="content-section space-y-6">
+                <p class="text-lg text-neutral-700">This assessment plan outlines a rigorous, non-intrusive security evaluation for the LETVIS Air Traffic Management (ATM) system. As critical infrastructure, the assessment prioritizes operational safety, system integrity, and availability, guided by NIST and ICS-specific standards. This interactive view allows you to explore the plan's objectives, scope, and methodology.</p>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold text-blue-700 mb-3">Assessment Objectives</h2>
+                        <ul class="list-disc list-inside space-y-2 text-neutral-700">
+                            <li>Identify security gaps against industry standards (NIST SP 800-82, RTCA DO-326A).</li>
+                            <li>Focus on vulnerabilities impacting data integrity and system availability.</li>
+                            <li>Ensure zero interference with live air traffic control operations.</li>
+                            <li>Deliver an evidence-based, "snap-shot" evaluation of the current security posture.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold text-blue-700 mb-3">Key Constraints</h2>
+                        <div class="flex items-center p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded">
+                            <div class="mr-4">
+                                <span class="text-3xl">⚠️</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-yellow-800">High-Velocity Assessment</p>
+                                <ul class="list-disc list-inside text-yellow-700">
+                                    <li><strong>Timeline:</strong> 8-day duration</li>
+                                    <li><strong>Team:</strong> 2-person assessment team</li>
+                                    <li><strong>Method:</strong> Primarily passive data collection</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-semibold text-blue-700 mb-3">System Scope: LETVIS Components</h2>
+                    <p class="text-neutral-700 mb-4">The assessment covers the core COTS (UNIX/Linux) hardware and software components of the LETVIS system. The logical data flow between these key assets is a primary focus for integrity analysis.</p>
+                    <div class="flex flex-wrap items-center justify-center gap-2 md:gap-4 p-4 bg-white rounded-lg shadow-md overflow-x-auto">
+                        <div class="text-center">
+                            <div class="font-mono p-3 bg-neutral-100 rounded-lg shadow-sm">arch</div>
+                            <div class="text-sm text-neutral-500">Core Architecture</div>
+                        </div>
+                        <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                        <div class="text-center">
+                            <div class="font-mono p-3 bg-neutral-100 rounded-lg shadow-sm">sup</div>
+                            <div class="text-sm text-neutral-500">Supervisory</div>
+                        </div>
+                        <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                        <div class="text-center">
+                            <div class="font-mono p-3 bg-red-100 rounded-lg shadow-sm border border-red-300">urdi</div>
+                            <div class="text-sm text-red-600">Radar Interface</div>
+                        </div>
+                        <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                        <div class="text-center">
+                            <div class="font-mono p-3 bg-neutral-100 rounded-lg shadow-sm">rdd</div>
+                            <div class="text-sm text-neutral-500">Radar Display</div>
+                        </div>
+                        <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                        <div class="text-center">
+                            <div class="font-mono p-3 bg-red-100 rounded-lg shadow-sm border border-red-300">fdp 11</div>
+                            <div class="text-sm text-red-600">Flight Data Processor</div>
+                        </div>
+                        <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                        <div class="text-center">
+                            <div class="font-mono p-3 bg-neutral-100 rounded-lg shadow-sm">fddsup</div>
+                            <div class="text-sm text-neutral-500">FDD Supervisory</div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Section 2: Execution Plan -->
+            <section id="plan" class="content-section hidden space-y-6">
+                <p class="text-lg text-neutral-700">The 8-day execution plan is meticulously structured to maximize efficiency for the two-person team. It front-loads data collection (interviews, network capture, configuration review) and dedicates the second half to analysis, correlation, and report generation. The chart below visualizes the 8-day parallel effort, with detailed tasks listed in the timeline grid.</p>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold text-blue-700 mb-4">8-Day Assessment Workload</h2>
+                    <p class="text-neutral-600 mb-4 text-sm text-center">This chart represents the 8-day (8 units) timeline for each assessor. Hover over any colored segment for the specific tasks for that day.</p>
+                    <div class="chart-container">
+                        <canvas id="planChart"></canvas>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold text-blue-700 mb-3">Detailed 8-Day Timeline</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Day 1-8 Cards -->
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-blue-500">
+                        <h3 class="font-bold text-xl text-blue-700 mb-2">Day 1: Kickoff & Prep</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Kickoff, Finalize Scope, Review SSP/Architecture.</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Prepare PCAP collection (Wireshark/Zeek), Verify TAPs/SPANs.</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Finalized Assessment Plan.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-blue-500">
+                        <h3 class="font-bold text-xl text-blue-700 mb-2">Day 2: Interviews & Collection</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Interview Core System Owner (DR, Policy).</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Execute Configuration Baseline Collection (Ansible check mode).</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Initial Config Baselines.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-blue-500">
+                        <h3 class="font-bold text-xl text-blue-700 mb-2">Day 3: Deep Dive & PCAP</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Interview URDI/FDP Managers (Data Integrity, ASTERIX).</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Initiate Passive Network Data Collection (Full PCAP) on URDI/FDP segments.</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Initial Gap Analysis.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-blue-500">
+                        <h3 class="font-bold text-xl text-blue-700 mb-2">Day 4: Network Analysis</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Interview IT/OT Network/Security Teams (Segmentation, Patching).</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Deep Dive PCAP Analysis (Tshark/Zeek) for unauthenticated protocols.</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Protocol Security Gaps Identified.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-green-500">
+                        <h3 class="font-bold text-xl text-green-700 mb-2">Day 5: Correlation</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Review UNIX/Linux hardening results (Access Control, Logging).</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Review Network configs (ACLs) & correlate Nessus patch reports (Plugin 66334).</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Verified Vulnerability Status.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-green-500">
+                        <h3 class="font-bold text-xl text-green-700 mb-2">Day 6: Draft Findings</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Draft Findings, Prioritize Risk (DO-326A context).</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Compile/normalize technical evidence (PCAPs, configs, logs).</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Draft Risk Register.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-green-500">
+                        <h3 class="font-bold text-xl text-green-700 mb-2">Day 7: Finalize Report</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Finalize Risk Assessment, Draft Recommendations (Policy, Governance).</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Develop System Playbook templates for internal checks.</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Draft Report (Internal QA).</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg shadow-md border-t-4 border-green-500">
+                        <h3 class="font-bold text-xl text-green-700 mb-2">Day 8: Delivery</h3>
+                        <p class="text-sm"><strong>A1 (Risk):</strong> Final Report Production, Executive Summary, Stakeholder Briefing.</p>
+                        <p class="text-sm"><strong>A2 (Tech):</strong> Finalize Remediation Action Plan Roadmap.</p>
+                        <p class="text-sm mt-2 font-semibold"><strong>Deliverable:</strong> Final Report Submission.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Methods & Tools -->
+            <section id="methods" class="content-section hidden space-y-6">
+                <p class="text-lg text-neutral-700">A zero-impact assessment in a live ATM environment requires specialized, passive data collection techniques. The methodology relies on three pillars: capturing network traffic non-intrusively, reviewing configurations and logs, and conducting structured interviews with system owners to validate processes.</p>
+                
+                <h2 class="text-2xl font-semibold text-blue-700 mb-3">Data Collection Pillars</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-blue-700 mb-2">Network Packet Analysis</h3>
+                        <p class="text-neutral-600 mb-3">Passively capture and analyze traffic from TAPs or SPAN ports to map data flows and find protocol anomalies without sending a single packet.</p>
+                        <ul class="font-mono text-sm space-y-1 text-neutral-700">
+                            <li>Wireshark/Tshark</li>
+                            <li>Zeek (NSM Framework)</li>
+                            <li>Malcolm / Arkime</li>
+                            <li>ASTERIX Protocol Analysis</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-blue-700 mb-2">Config & Integrity Validation</h3>
+                        <p class="text-neutral-600 mb-3">Review system hardening, patch status, and file integrity logs to validate the "known good state" of COTS components.</p>
+                        <ul class="font-mono text-sm space-y-1 text-neutral-700">
+                            <li>Ansible (Check Mode)</li>
+                            <li>Nessus Scan Reports (Credentialed)</li>
+                            <li>File Integrity (FIM) Logs</li>
+                            <li>Syslog / SIEM Review</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-blue-700 mb-2">System Owner Interviews</h3>
+                        <p class="text-neutral-600 mb-3">The primary method for gathering subjective evidence, validating documented controls, and identifying procedural gaps.</p>
+                        <ul class="font-mono text-sm space-y-1 text-neutral-700">
+                            <li>System/Asset Visibility</li>
+                            <li>Operational Continuity (DR)</li>
+                            <li>Change Management</li>
+                            <li>Safety/Cyber Integration</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-semibold text-blue-700 mb-3">Critical Interview Protocol</h2>
+                    <p class="text-neutral-700 mb-4">Interviews are structured to assess process maturity. Below are key question areas targeted at system owners and managers.</p>
+                    
+                    <div class="space-y-2">
+                        <details class="bg-white rounded-lg shadow-sm">
+                            <summary class="font-semibold p-4 cursor-pointer">I. System and Asset Visibility</summary>
+                            <div class="p-4 border-t border-neutral-200 text-neutral-600 space-y-2">
+                                <p><strong>Key Probe:</strong> Do you maintain a complete, current asset inventory that tracks all COTS software, custom code versions, and firmware for URDI/FDP components?</p>
+                                <p><strong>Goal:</strong> Assess maturity of asset management.</p>
+                            </div>
+                        </details>
+                        <details class="bg-white rounded-lg shadow-sm">
+                            <summary class="font-semibold p-4 cursor-pointer">II. Operational Continuity & Resilience</summary>
+                            <div class="p-4 border-t border-neutral-200 text-neutral-600 space-y-2">
+                                <p><strong>Key Probe:</strong> What is the Maximum Acceptable Downtime (MAD) for the FDP and URDI systems, and how recently have full Disaster Recovery (DR) procedures been tested?</p>
+                                <p><strong>Goal:</strong> Validate resilience and test fidelity.</p>
+                            </div>
+                        </details>
+                        <details class="bg-white rounded-lg shadow-sm">
+                            <summary class="font-semibold p-4 cursor-pointer">III. Change and Configuration Management</summary>
+                            <div class="p-4 border-t border-neutral-200 text-neutral-600 space-y-2">
+                                <p><strong>Key Probe:</strong> How is configuration integrity verified immediately after a change? Are File Integrity Monitoring (FIM) systems used?</p>
+                                <p><strong>Goal:</strong> Assess change control and config drift detection.</p>
+                            </div>
+                        </details>
+                        <details class="bg-white rounded-lg shadow-sm">
+                            <summary class="font-semibold p-4 cursor-pointer">IV. Network and Protocol Security</summary>
+                            <div class="p-4 border-t border-neutral-200 text-neutral-600 space-y-2">
+                                <p><strong>Key Probe:</strong> What compensating controls ensure the authenticity and integrity of data streams using protocols known to lack built-in security (e.g., ASTERIX, ADS-B)?</p>
+                                <p><strong>Goal:</strong> Identify controls for insecure-by-design protocols.</p>
+                            </div>
+                        </details>
+                        <details class="bg-white rounded-lg shadow-sm">
+                            <summary class="font-semibold p-4 cursor-pointer">VI. Safety/Cyber Integration (DO-326A Context)</summary>
+                            <div class="p-4 border-t border-neutral-200 text-neutral-600 space-y-2">
+                                <p><strong>Key Probe:</strong> Has a formal Security Risk Assessment Process (SRAP) been completed, explicitly mapping cyber threats to potential operational safety hazards?</p>
+                                <p><strong>Goal:</strong> Determine if cyber risk is tied to operational safety.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Focus Areas (Playbooks) -->
+            <section id="focus" class="content-section hidden space-y-6">
+                <p class="text-lg text-neutral-700">To ensure comprehensive coverage, the assessment uses three system-specific "playbooks." These detail the repeatable technical audit steps for the most critical parts of the LETVIS architecture. Select a tab below to explore the specific audit focus for each area.</p>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <nav class="mb-4">
+                        <ul class="flex border-b border-neutral-300">
+                            <li><button class="sub-tab active-sub-tab" data-subtarget="playbook-network">1. Network Infrastructure</button></li>
+                            <li><button class="sub-tab" data-subtarget="playbook-core">2. LETVIS Core (UNIX/Linux)</button></li>
+                            <li><button class="sub-tab" data-subtarget="playbook-urdi">3. URDI & FDP</button></li>
+                        </ul>
+                    </nav>
+
+                    <div id="playbook-network" class="playbook-content space-y-3">
+                        <h3 class="text-xl font-semibold text-blue-700">Focus: Segmentation & Protocol Integrity</h3>
+                        <p class="text-neutral-700">This playbook protects the integrity of surveillance and flight data transmitted over the network.</p>
+                        <ul class="list-disc list-inside space-y-2 text-neutral-600">
+                            <li><strong>Validate Segmentation:</strong> Review firewall/router rules to confirm strict logical separation between the business (IT) and operational (OT) networks.</li>
+                            <li><strong>Passive Data Flow Mapping:</strong> Analyze PCAP data to map actual communication patterns and detect undocumented connections.</li>
+                            <li><strong>Protocol Efficacy Review:</strong> Target ASTERIX and ADS-B traffic to find compensating controls (e.g., protocol-aware IDS) that inspect for spoofing or injection.</li>
+                            <li><strong>Device Hardening:</strong> Review switch/router configs for secure management (SSH, MFA) and strict Access Control Lists (ACLs).</li>
+                        </ul>
+                    </div>
+
+                    <div id="playbook-core" class="playbook-content hidden space-y-3">
+                        <h3 class="text-xl font-semibold text-blue-700">Focus: COTS System Hardening</h3>
+                        <p class="text-neutral-700">This playbook focuses on the COTS UNIX/Linux operating systems that form the backbone of LETVIS.</p>
+                        <ul class="list-disc list-inside space-y-2 text-neutral-600">
+                            <li><strong>Principle of Least Functionality:</strong> Use Ansible (check mode) to verify that all unnecessary services (daemons) and tools are removed or disabled.</li>
+                            <li><strong>User and Privilege Audit:</strong> Review system files to audit all local user accounts, verify strong password policies, and ensure least privilege is enforced.</li>
+                            <li><strong>Log Management Validation:</strong> Confirm comprehensive logging (auditd, Syslog) is enabled and logs are forwarded to a central aggregator.</li>
+                            <li><strong>Integrity and Patch Status:</strong> Review FIM logs for unauthorized changes and correlate with Nessus (Plugin 66334) to confirm patches are fully enabled.</li>
+                        </ul>
+                    </div>
+
+                    <div id="playbook-urdi" class="playbook-content hidden space-y-3">
+                        <h3 class="text-xl font-semibold text-red-700">Focus: Safety-Critical Data Integrity (URDI & FDP)</h3>
+                        <p class="text-neutral-700">The URDI and FDP are the repositories of safety-critical data. This playbook prioritizes controls that protect this data from corruption.</p>
+                        <ul class="list-disc list-inside space-y-2 text-neutral-600">
+                            <li><strong>Data Integrity Assurance:</strong> Review input validation mechanisms on the URDI to verify how the system handles malformed or malicious data packets.</li>
+                            <li><strong>Application Access Control:</strong> Audit file permissions on the `fdp 11` and `fddsup` directories, as unauthorized modification is a direct safety threat.</li>
+                            <li><strong>Redundancy/Failover Verification:</strong> Review failover logs and interview managers regarding recent failover testing to ensure redundancy functions under stress.</li>
+                            <li><strong>Application FIM Review:</strong> Specifically target FIM logs for the core FDP binaries to detect any code alteration or configuration corruption.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Identified Gaps -->
+            <section id="gaps" class="content-section hidden space-y-6">
+                <p class="text-lg text-neutral-700">A mature assessment must look beyond immediate technical findings. The plan identifies four critical areas—often missed in standard IT audits—that are essential for the security of critical infrastructure. Addressing these gaps is fundamental to building long-term resilience.</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-5 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+                        <h3 class="text-xl font-semibold text-yellow-800 mb-2">1. Safety & Airworthiness Integration</h3>
+                        <p class="text-yellow-700">The most significant gap. A vulnerability's risk *must* be scored by its maximum credible operational safety impact (per DO-326A), not just its CVSS score. A compromise to data integrity (e.g., in the URDI) is a direct safety hazard.</p>
+                    </div>
+                    <div class="p-5 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+                        <h3 class="text-xl font-semibold text-yellow-800 mb-2">2. External Interface Security</h3>
+                        <p class="text-yellow-700">The plan must assess the security of external data feeds, especially broadcast protocols like ADS-B, which lack authentication. A hardened URDI can still be compromised by corrupted data if input validation at the boundary fails.</p>
+                    </div>
+                    <div class="p-5 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+                        <h3 class="text-xl font-semibold text-yellow-800 mb-2">3. Physical & Environmental Security</h3>
+                        <p class="text-yellow-700">Physical security is a foundational OT control. The assessment must passively observe and verify physical access controls to server rooms, network closets (TAPs), and control consoles, as this is the simplest bypass for digital defenses.</p>
+                    </div>
+                    <div class="p-5 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+                        <h3 class="text-xl font-semibold text-yellow-800 mb-2">4. Policy & Governance Gaps</h3>
+                        <p class="text-yellow-700">Technical failures are often symptoms of policy failures. The plan must identify gaps in security governance, such as a lack of defined metrics, insufficient OT security training, and no commitment to a continuous assessment cadence.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Risk & Outcomes -->
+            <section id="outcomes" class="content-section hidden space-y-6">
+                <p class="text-lg text-neutral-700">The final deliverables of the assessment are a safety-weighted risk register and a set of actionable recommendations. The goal is to provide a clear, prioritized roadmap for improving the security posture of the LETVIS system, with an emphasis on systemic and sustainable resilience.</p>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold text-blue-700 mb-3">Risk Prioritization Matrix</h2>
+                        <p class="text-neutral-600 mb-4">Risk is scored by linking the likelihood of a threat to its maximum *operational safety impact*, prioritizing safety hazards above all else.</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left table-auto">
+                                <thead class="bg-neutral-100 text-neutral-600">
+                                    <tr>
+                                        <th class="p-3 font-semibold">Risk Level</th>
+                                        <th class="p-3 font-semibold">Criteria</th>
+                                        <th class="p-3 font-semibold">Deadline</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-200">
+                                    <tr class="bg-red-100 text-red-800">
+                                        <td class="p-3 font-bold">CRITICAL</td>
+                                        <td class="p-3 text-sm">High Likelihood & Catastrophic Operational Impact (Loss of separation, flight hazard).</td>
+                                        <td class="p-3 font-medium">Immediate (72h)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-orange-600">HIGH</td>
+                                        <td class="p-3 text-sm">Medium Likelihood & High Impact (Prolonged service disruption, data corruption).</td>
+                                        <td class="p-3 font-medium">30 days</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-yellow-600">MODERATE</td>
+                                        <td class="p-3 text-sm">Medium Likelihood & Medium Impact (Policy violation, config drift).</td>
+                                        <td class="p-3 font-medium">90 days</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-green-600">LOW</td>
+                                        <td class="p-3 text-sm">Low Likelihood & Low Impact (Documentation gaps, minor hardening deficit).</td>
+                                        <td class="p-3 font-medium">180+ days</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-2xl font-semibold text-blue-700 mb-3">Actionable Recommendations</h2>
+                        <p class="text-neutral-600 mb-4">The final report will focus on strategic recommendations for systemic improvement.</p>
+                        <ol class="list-decimal list-outside space-y-3 pl-5 text-neutral-700">
+                            <li><strong>Mandate Safety/Cyber Integration:</strong> Formally implement the DO-326A/DO-355A risk process (SRAP), linking all cyber vulnerabilities to their maximum operational safety consequence.</li>
+                            <li><strong>Implement Compensating Controls:</strong> Deploy protocol-aware Network Detection & Response (NDR) tools (e.g., Zeek) to monitor insecure-by-design protocols like ASTERIX and ADS-B for spoofing.</li>
+                            <li><strong>Establish Configuration Baselines:</strong> Define and document the "known good state" for all UNIX/Linux systems and use FIM tools to continuously monitor for configuration drift.</li>
+                            <li><strong>Strengthen Patch Validation:</strong> Update patch management procedures to *require* verification using credentialed scan data (e.g., Nessus 66334) to ensure patches are fully enabled, not just installed.</li>
+                            <li><strong>Transition to Continuous Monitoring:</strong> Move from periodic "snap-shot" assessments to a continuous security improvement framework with regular DR testing and ongoing staff training.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="text-center p-6 mt-8 border-t border-neutral-300">
+        <p class="text-sm text-neutral-500">This interactive report is an exploration of the "Expert Security Assessment Plan for the LETVIS Air Traffic Management System."</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const tabs = document.querySelectorAll('.nav-tab');
+            const sections = document.querySelectorAll('.content-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+
+                    tabs.forEach(t => t.classList.remove('active-tab'));
+                    tab.classList.add('active-tab');
+
+                    sections.forEach(section => {
+                        if (section.id === target) {
+                            section.classList.remove('hidden');
+                        } else {
+                            section.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            
+            const subTabs = document.querySelectorAll('.sub-tab');
+            const playbooks = document.querySelectorAll('.playbook-content');
+
+            subTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-subtarget');
+
+                    subTabs.forEach(t => t.classList.remove('active-sub-tab'));
+                    tab.classList.add('active-sub-tab');
+
+                    playbooks.forEach(playbook => {
+                        if (playbook.id === target) {
+                            playbook.classList.remove('hidden');
+                        } else {
+                            playbook.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            
+            const planChartCtx = document.getElementById('planChart');
+            if (planChartCtx) {
+                const planData = [
+                    { day: 1, deliverable: 'Finalized Assessment Plan', a1: 'Day 1: Kickoff, Finalize Scope, Review SSP/Architecture.', a2: 'Day 1: Prepare PCAP collection (Wireshark/Zeek), Verify TAPs/SPANs.' },
+                    { day: 2, deliverable: 'Initial Config Baselines', a1: 'Day 2: Interview Core System Owner (DR, Policy).', a2: 'Day 2: Execute Configuration Baseline Collection (Ansible check mode).' },
+                    { day: 3, deliverable: 'Initial Gap Analysis', a1: 'Day 3: Interview URDI/FDP Managers (Data Integrity, ASTERIX).', a2: 'Day 3: Initiate Passive Network Data Collection (Full PCAP).' },
+                    { day: 4, deliverable: 'Protocol Security Gaps', a1: 'Day 4: Interview IT/OT Network/Security Teams (Segmentation, Patching).', a2: 'Day 4: Deep Dive PCAP Analysis (Tshark/Zeek).' },
+                    { day: 5, deliverable: 'Verified Vulnerability Status', a1: 'Day 5: Review UNIX/Linux hardening results (Access Control, Logging).', a2: 'Day 5: Review Network configs (ACLs) & correlate Nessus patch reports.' },
+                    { day: 6, deliverable: 'Draft Risk Register', a1: 'Day 6: Draft Findings, Prioritize Risk (DO-326A context).', a2: 'Day 6: Compile/normalize technical evidence (PCAPs, configs, logs).' },
+                    { day: 7, deliverable: 'Draft Report (Internal QA)', a1: 'Day 7: Finalize Risk Assessment, Draft Recommendations (Policy, Governance).', a2: 'Day 7: Develop System Playbook templates.' },
+                    { day: 8, deliverable: 'Final Report Submission', a1: 'Day 8: Final Report Production, Executive Summary, Stakeholder Briefing.', a2: 'Day 8: Finalize Remediation Action Plan Roadmap.' }
+                ];
+
+                new Chart(planChartCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Assessor 1 (Doc/Risk)', 'Assessor 2 (Tech/Config)'],
+                        datasets: planData.map((item, index) => ({
+                            label: `Day ${item.day}: ${item.deliverable}`,
+                            data: [1, 1],
+                            backgroundColor: index < 4 ? 'rgba(59, 130, 246, 0.7)' : 'rgba(16, 185, 129, 0.7)',
+                            stack: 'timeline'
+                        }))
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Assessment Days'
+                                },
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].dataset.label;
+                                    },
+                                    label: function(context) {
+                                        const dayIndex = context.datasetIndex;
+                                        const assessorIndex = context.dataIndex;
+                                        if (assessorIndex === 0) {
+                                            return planData[dayIndex].a1;
+                                        } else {
+                                            return planData[dayIndex].a2;
+                                        }
+                                    }
+                                }
+                            },
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
