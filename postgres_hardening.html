@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostgreSQL Security Hardening: An Assessment Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 1.8em;
+            color: #3498db;
+        }
+        h3 {
+            font-size: 1.4em;
+            color: #2c3e50;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 1em;
+        }
+        ol {
+            margin-left: 20px;
+            margin-bottom: 1em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        code {
+            background-color: #eef;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            color: #c0392b;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1em;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .note {
+            background-color: #eaf6fd;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin-bottom: 1.5em;
+            border-radius: 4px;
+        }
+        .note strong {
+            color: #2c3e50;
+        }
+        .author {
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PostgreSQL Security Hardening: A Comprehensive Assessment Guide</h1>
+
+        <p class="author">By Your Security Analyst Assistant</p>
+
+        <p>In today's interconnected world, database security is paramount. PostgreSQL, a powerful open-source object-relational database system, is no exception. While robust, a default PostgreSQL installation often lacks the necessary hardening to withstand sophisticated attacks. This guide provides a structured approach to assessing your PostgreSQL installation for security vulnerabilities, focusing on critical configurations and remote access.</p>
+
+        <div class="note">
+            <strong>Important Note:</strong> This assessment specifically considers PostgreSQL 14 running with an exposed port, including a scenario with a synchronously replicating secondary system. A compromise on one system can directly impact the other.
+        </div>
+
+        <h2>Understanding the Risks: Default Configuration Vulnerabilities</h2>
+        <p>Many security vulnerabilities stem from unaddressed default settings. Here are seven common high-risk findings if no hardening has been applied:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Finding Description</th>
+                    <th>Manual Verification in Configuration Files</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1.</td>
+                    <td><strong>Unencrypted Communication:</strong> Data transmitted over the network is unencrypted, as <strong>SSL/TLS is not enabled</strong> by default, leaving sensitive information vulnerable to network eavesdropping.</td>
+                    <td><strong>Check <code>postgresql.conf</code>:</strong> Verify the line is set to <code>ssl = on</code>. If it is commented out (<code>#</code>) or set to <code>off</code>, encryption is not active.</td>
+                </tr>
+                <tr>
+                    <td>2.</td>
+                    <td><strong>Broad Remote Access:</strong> The server may be configured to <strong>listen on all interfaces</strong> (<code>listen_addresses = '*'</code>) and potentially allows connections from any external network in <code>pg_hba.conf</code>, significantly increasing the attack surface.</td>
+                    <td><strong>Check <code>postgresql.conf</code>:</strong> Verify <code>listen_addresses</code> is restricted to specific IP addresses (e.g., <code>192.168.1.10</code>) or <code>localhost</code>, not <code>*</code>. <strong>Check <code>pg_hba.conf</code>:</strong> Look for any remote <code>host</code> entries using the unrestricted CIDR range <code>0.0.0.0/0</code>.</td>
+                </tr>
+                <tr>
+                    <td>3.</td>
+                    <td><strong>Weak Authentication Method:</strong> Authentication for remote access may be set to less secure methods like <strong><code>trust</code> or <code>md5</code></strong> instead of the more robust <code>scram-sha-256</code>, making it susceptible to credential theft or brute-forcing.</td>
+                    <td><strong>Check <code>pg_hba.conf</code>:</strong> In remote <code>host</code> entries (for client or replication access), confirm the final column (the authentication method) is set to <strong><code>scram-sha-256</code></strong> and not <code>md5</code>, <code>password</code>, or <code>trust</code>.</td>
+                </tr>
+                <tr>
+                    <td>4.</td>
+                    <td><strong>Default Superuser:</strong> The <strong>default <code>postgres</code> superuser role</strong> is active and may be accessible remotely, posing a high-privilege target for attackers to compromise.</td>
+                    <td><strong>Check <code>pg_hba.conf</code>:</strong> Search for any remote <code>host</code> entries specifically allowing connections for the user <code>postgres</code> and ensure the access is either blocked or restricted to only <code>localhost</code> (<code>127.0.0.1/32</code>).</td>
+                </tr>
+                <tr>
+                    <td>5.</td>
+                    <td><strong>Unrestricted Replication User:</strong> The replication user account may be poorly secured or use overly permissive network access, potentially allowing an attacker to leverage the replication mechanism for unauthorized access or data exfiltration.</td>
+                    <td><strong>Check <code>pg_hba.conf</code>:</strong> Review the dedicated <code>host replication</code> entry to ensure the IP range is limited strictly to the secondary replica's host address (<code>/32</code>) and uses a strong authentication method like <code>scram-sha-256</code>.</td>
+                </tr>
+                <tr>
+                    <td>6.</td>
+                    <td><strong>No Connection Rate Limiting:</strong> There is **no external mechanism** or database setting to aggressively log and block repeated failed login attempts, making the service highly vulnerable to brute-force attacks.</td>
+                    <td><strong>Check <code>postgresql.conf</code>:</strong> While external tools are best, verify that logging is enabled with <code>log_connections = on</code> and <code>log_disconnections = on</code> to at least record the attack attempts for later analysis or for tools like Fail2ban.</td>
+                </tr>
+                <tr>
+                    <td>7.</td>
+                    <td><strong>Unnecessary Privileges:</strong> Database users may hold **unnecessarily broad default privileges** on new objects and databases, violating the principle of least privilege.</td>
+                    <td><strong>Check with <code>psql</code>:</strong> Execute <code>\du</code> to check for non-administrative user roles that have the <strong><code>CREATEROLE</code></strong> or <strong><code>CREATEDB</code></strong> attributes. Run <code>SHOW default_acl_config;</code> to check default object privileges.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Comprehensive Security Checklist</h2>
+        <p>This detailed checklist provides actionable steps and tools for a thorough security assessment of your PostgreSQL 14 server.</p>
+
+        <h3>A. Network Access and Firewall Configuration</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Check Detail</th>
+                    <th>Tools</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>**Firewall Status**</td>
+                    <td>Verify an **external firewall** (e.g., <code>iptables</code>, <code>ufw</code>, security group) is active on the host OS and configured to block all ports by default.</td>
+                    <td><code>sudo ufw status</code>, <code>sudo iptables -L -v -n</code>, Cloud Console</td>
+                </tr>
+                <tr>
+                    <td>**Port Exposure (Remote)**</td>
+                    <td>Confirm the PostgreSQL port (default **5432**) is only open to **trusted source IP addresses/networks** for clients.</td>
+                    <td>**<code>nmap</code>** (from an external host), **<code>netstat</code> / <code>ss</code>** (on the DB server), Cloud Console</td>
+                </tr>
+                <tr>
+                    <td>**Port Exposure (Replication)**</td>
+                    <td>Confirm the PostgreSQL port is open **only to the secondary replica's specific IP** for replication traffic.</td>
+                    <td>**<code>nmap</code>** (from the replica host), **<code>netstat</code> / <code>ss</code>** (on the DB server), Cloud Console</td>
+                </tr>
+                <tr>
+                    <td>**<code>listen_addresses</code>**</td>
+                    <td>Check <code>postgresql.conf</code> to ensure <code>listen_addresses</code> is restricted to required IP addresses, not set to <code>*</code>.</td>
+                    <td><code>grep postgresql.conf</code>, <code>psql</code> (using <code>SHOW listen_addresses;</code>)</td>
+                </tr>
+                <tr>
+                    <td>**Brute-Force Defense**</td>
+                    <td>Verify a tool like **<code>Fail2ban</code>** is installed, active, and configured to monitor PostgreSQL logs for failed logins and automatically block the attacker's source IP address.</td>
+                    <td><code>sudo systemctl status fail2ban</code>, <code>fail2ban-client status postgresql</code> (on the DB server)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>B. Authentication and Access Control (<code>pg_hba.conf</code>)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Check Detail</th>
+                    <th>Tools</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>**Allowed Hosts**</td>
+                    <td>Verify all <code>pg_hba.conf</code> remote entries use **specific, minimal CIDR ranges** (e.g., <code>/32</code> for a single host) instead of wide ranges like <code>0.0.0.0/0</code>.</td>
+                    <td><code>cat /path/to/pg_hba.conf</code></td>
+                </tr>
+                <tr>
+                    <td>**Authentication Method**</td>
+                    <td>Ensure authentication for remote client and replication connections is set to the highly secure **<code>scram-sha-256</code>**.</td>
+                    <td><code>cat /path/to/pg_hba.conf</code></td>
+                </tr>
+                <tr>
+                    <td>**Replication Entry**</td>
+                    <td>Verify the <code>replication</code> line in <code>pg_hba.conf</code> is **strictly limited** to the specific replication user and the secondary replica's IP.</td>
+                    <td><code>cat /path/to/pg_hba.conf</code></td>
+                </tr>
+                <tr>
+                    <td>**Superuser Access**</td>
+                    <td>Confirm remote access for the <code>postgres</code> superuser is **explicitly disabled** or severely restricted to <code>localhost</code> access only.</td>
+                    <td><code>cat /path/to/pg_hba.conf</code></td>
+                </tr>
+                <tr>
+                    <td>**Template Database Access**</td>
+                    <td>Ensure non-administrative users are denied access to the <code>template0</code> and <code>template1</code> databases.</td>
+                    <td>**<code>psql</code>** (attempting connection as a low-privilege user)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>C. Encryption (SSL/TLS)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Check Detail</th>
+                    <th>Tools</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>**SSL Enforcement**</td>
+                    <td>Verify <code>postgresql.conf</code> has **<code>ssl = on</code>** and secure ciphers are configured via <code>ssl_ciphers</code> (to prevent use of weak encryption).</td>
+                    <td><code>psql</code> (using <code>SHOW ssl;</code> and <code>SHOW ssl_ciphers;</code>)</td>
+                </tr>
+                <tr>
+                    <td>**SSL Mode in <code>pg_hba.conf</code>**</td>
+                    <td>Check <code>pg_hba.conf</code> to ensure remote connections *require* SSL using the **<code>hostssl</code>** record type instead of <code>host</code>.</td>
+                    <td><code>grep hostssl /path/to/pg_hba.conf</code></td>
+                </tr>
+                <tr>
+                    <td>**Certificate Validity**</td>
+                    <td>Confirm the SSL certificate and key files are present, correctly referenced in <code>postgresql.conf</code>, and are **valid (not expired)**.</td>
+                    <td>**<code>openssl</code>** (`openssl x509 -text -noout -in server.crt`)</td>
+                </tr>
+                <tr>
+                    <td>**Client Connection Test**</td>
+                    <td>Attempt to connect using a client with **<code>sslmode=disable</code>** to ensure the server rejects the unencrypted connection.</td>
+                    <td>**<code>psql</code>** (e.g., <code>psql "host=... sslmode=disable"</code>)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>D. User, Role, and Replication Management</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Check Detail</th>
+                    <th>Tools</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>**Strong Passwords**</td>
+                    <td>Confirm a strong password policy is enforced for all users, including the critical **replication user**.</td>
+                    <td>Manual review/audit, <code>psql</code> (checking password complexity policies if external tools are used)</td>
+                </tr>
+                <tr>
+                    <td>**Role Permissions**</td>
+                    <td>Review all existing roles (<code>\du</code>) to ensure non-administrative users do not have **<code>SUPERUSER</code>**, **<code>CREATEROLE</code>**, or **<code>CREATEDB</code>** privileges.</td>
+                    <td>**<code>psql</code>** (using <code>\du</code>)</td>
+                </tr>
+                <tr>
+                    <td>**Replication User**</td>
+                    <td>Verify the dedicated replication user only has the **<code>REPLICATION</code>** attribute and the **<code>LOGIN</code>** attribute, with no other administrative rights.</td>
+                    <td>**<code>psql</code>** (using <code>\du replication_user;</code>)</td>
+                </tr>
+                <tr>
+                    <td>**Replication Slot Access**</td>
+                    <td>If using replication slots, ensure the replication user is the *only* one allowed to manage or drop these slots.</td>
+                    <td>**<code>psql</code>** (querying <code>pg_stat_replication</code> and checking user privileges)</td>
+                </tr>
+                <tr>
+                    <td>**Search Path Hardening**</td>
+                    <td>Check the default <code>search_path</code> for users to ensure it does **not include 'public'** before other schemas, preventing possible public schema attacks.</td>
+                    <td>**<code>psql</code>** (using <code>SHOW search_path;</code>)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>E. Vulnerability Scanning and Penetration Testing Tools</h3>
+        <p>These tools are executed from an external client or attacker-simulated host to probe the exposed port and identify potential weaknesses.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tool</th>
+                    <th>Purpose</th>
+                    <th>Example Commands</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>**<code>psql</code> Client**</td>
+                    <td>The primary tool for testing authentication, SSL enforcement, and configuration from a client perspective.</td>
+                    <td><code>psql -h &lt;IP&gt; -p 5432 -U postgres -W</code> (Test authentication)</td>
+                </tr>
+                <tr>
+                    <td>**<code>nmap</code> (with Scripts)**</td>
+                    <td>Used for port scanning, service version detection, and executing PostgreSQL-specific vulnerability checks.</td>
+                    <td><code>nmap -p 5432 --script pgsql-brute,pgsql-enum &lt;IP&gt;</code></td>
+                </tr>
+                <tr>
+                    <td>**<code>Hydra</code> / `medusa`**</td>
+                    <td>Used to perform **brute-force password guessing** against the exposed service to test the effectiveness of password strength and rate-limiting.</td>
+                    <td><code>hydra -L users.txt -P passwords.txt &lt;IP&gt; postgres</code></td>
+                </tr>
+                <tr>
+                    <td>**<code>netcat</code> (`nc`)**</td>
+                    <td>Basic tool to confirm TCP connectivity and sometimes grab simple banner information.</td>
+                    <td><code>nc -vz &lt;IP&gt; 5432</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Conclusion</h2>
+        <p>A proactive and thorough security assessment is crucial for maintaining the integrity and confidentiality of your PostgreSQL data. By systematically reviewing each item in this guide and implementing the recommended hardening measures, you can significantly reduce your database's attack surface and bolster its defenses against potential threats. Regular re-assessment and staying updated with PostgreSQL's security advisories are also vital for long-term security.</p>
+    </div>
+</body>
+</html>
