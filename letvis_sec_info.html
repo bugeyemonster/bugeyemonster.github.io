@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-R">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LETVIS Security Assessment Infographic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: brilliant blues -->
+    <!-- Application Structure Plan: The infographic is structured as a single, scrolling narrative divided into 7 logical sections to tell a story: 1. The Challenge (Scope & Constraints), 2. Guiding Principles (Standards), 3. The 8-Day Plan (Visualization), 4. Assessment Methods (Tools & Chart), 5. Core Focus Areas (Playbooks), 6. Beyond the Obvious (Identified Gaps), 7. Risk & Recommendations (Matrix & Actions). This narrative structure was chosen over a complex dashboard to guide the user through the plan from start to finish, making the dense, report-based content digestible, which is the primary goal of an infographic. -->
+    <!-- Visualization & Content Choices: 
+1. Data: Key Constraints (8 days, 2 people). Goal: Inform. Viz: "Big Number" callouts. Justification: High-impact, quick communication of core challenge. Method: HTML/Tailwind.
+2. Data: LETVIS System Scope. Goal: Organize. Viz: HTML/Tailwind Flow Diagram. Justification: Visually represents system components better than a list. Method: HTML/Tailwind (NO SVG/Mermaid).
+3. Data: 8-Day Execution Plan. Goal: Show Change (time). Viz: Vertical Timeline. Justification: A classic infographic element to clearly show a process flow over time. Method: HTML/Tailwind (NO SVG/Mermaid).
+4. Data: Assessment Effort (Synthetic). Goal: Show Composition. Viz: Donut Chart. Justification: Visually breaks down the assessment focus into key workstreams (e.g., Network Analysis, Config Review, Interviews). Method: Chart.js (Canvas), with required label wrapping and tooltip callbacks.
+5. Data: 4 Critical Gaps. Goal: Organize/Inform. Viz: 4-Card layout with Unicode icons. Justification: Highlights these key findings clearly. Method: HTML/Tailwind (NO SVG).
+6. Data: Risk Prioritization Matrix. Goal: Organize. Viz: Styled HTML Table. Justification: Clearest way to present matrix data. Method: HTML/Tailwind.
+-->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-700">
+
+    <div class="container mx-auto p-4 md:p-10 max-w-6xl">
+
+        <header class="text-center my-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-900 mb-2">Security Assessment Infographic</h1>
+            <p class="text-xl md:text-2xl text-blue-700">A Visual Guide to the LETVIS ATM System Plan</p>
+        </header>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold text-blue-900 mb-3 text-center">1. The Challenge: Scope & Constraints</h2>
+            <p class="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-8">This assessment targets the critical LETVIS Air Traffic Management (ATM) system. The plan is built around a high-velocity, 8-day timeline with a small team, mandating a zero-impact, passive-first methodology to ensure operational safety.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-xl p-6 text-center border-b-4 border-blue-500">
+                    <div class="text-6xl font-bold text-blue-700">8</div>
+                    <div class="text-xl font-semibold text-gray-800">Days</div>
+                    <div class="text-gray-600">Total Assessment Duration</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-xl p-6 text-center border-b-4 border-blue-500">
+                    <div class="text-6xl font-bold text-blue-700">2</div>
+                    <div class="text-xl font-semibold text-gray-800">Assessors</div>
+                    <div class="text-gray-600">Handling All Data & Risk</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-xl p-6 text-center border-b-4 border-red-500">
+                    <div class="text-6xl font-bold text-red-700">0</div>
+                    <div class="text-xl font-semibold text-gray-800">Operational Impact</div>
+                    <div class="text-gray-600">Zero-Interference Mandate</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4 text-center">In-Scope LETVIS Components</h3>
+                <div class="flex flex-wrap items-center justify-center gap-2 md:gap-4 p-4 rounded-lg overflow-x-auto">
+                    <div class="text-center">
+                        <div class="font-mono p-3 bg-gray-100 rounded-lg shadow-sm">arch</div>
+                        <div class="text-sm text-gray-500">Core Arch</div>
+                    </div>
+                    <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                    <div class="text-center">
+                        <div class="font-mono p-3 bg-gray-100 rounded-lg shadow-sm">sup</div>
+                        <div class="text-sm text-gray-500">Supervisory</div>
+                    </div>
+                    <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                    <div class="text-center">
+                        <div class="font-mono p-3 bg-red-100 rounded-lg shadow-sm border border-red-300">urdi</div>
+                        <div class="text-sm text-red-600">Radar Interface</div>
+                    </div>
+                    <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                    <div class="text-center">
+                        <div class="font-mono p-3 bg-gray-100 rounded-lg shadow-sm">rdd</div>
+                        <div class="text-sm text-gray-500">Radar Display</div>
+                    </div>
+                    <span class="text-2xl text-blue-500 font-bold">&rarr;</span>
+                    <div class="text-center">
+                        <div class="font-mono p-3 bg-red-100 rounded-lg shadow-sm border border-red-300">fdp 11</div>
+                        <div class="text-sm text-red-600">Flight Data Processor</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold text-blue-900 mb-3 text-center">2. Guiding Principles: Critical Standards</h2>
+            <p class="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-8">The assessment is not a typical IT audit. It is anchored in critical infrastructure and aviation safety standards, where system integrity and availability are paramount.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-2">NIST SP 800-30</h3>
+                    <p class="font-semibold text-gray-800">Risk Assessment</p>
+                    <p class="text-gray-600 mt-2">Provides the core 4-step process: Prepare, Conduct, Communicate, and Maintain. Ensures a structured and repeatable risk determination.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-2">NIST SP 800-82</h3>
+                    <p class="font-semibold text-gray-800">ICS/OT Security</p>
+                    <p class="text-gray-600 mt-2">The non-interference mandate. Demands assessors understand OT safety risks and focus on "fail in known state" compensating controls.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-2">RTCA DO-326A</h3>
+                    <p class="font-semibold text-gray-800">Airworthiness Security</p>
+                    <p class="text-gray-600 mt-2">The safety integration mandate. Links cyber vulnerabilities directly to safety consequences, ensuring risk is prioritized by operational impact.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold text-blue-900 mb-3 text-center">3. The 8-Day Execution Plan</h2>
+            <p class="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-8">The 8-day timeline is a parallel effort, front-loading passive data collection (Days 1-4) and dedicating the second half to analysis, correlation, and reporting (Days 5-8).</p>
+            
+            <div class="relative max-w-3xl mx-auto">
+                <div class="absolute left-1/2 -ml-0.5 w-1 h-full bg-blue-200" aria-hidden="true"></div>
+                
+                <div class="relative space-y-8">
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-1/2 pr-8 text-right">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
+                                <h3 class="text-xl font-semibold text-blue-700">Day 1: Kickoff & Prep</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Finalize Scope, Review SSP. <strong>A2:</strong> Prepare PCAP collection (Wireshark/Zeek).</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-blue-700 rounded-full border-2 border-white"></div>
+                    </div>
+
+                    <div class="flex items-start flex-row-reverse">
+                        <div class="flex-shrink-0 w-1/2 pl-8 text-left">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-r-4 border-blue-500">
+                                <h3 class="text-xl font-semibold text-blue-700">Day 2: Interviews & Config</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Interview Core System Owner. <strong>A2:</strong> Execute Configuration Baseline Collection (Ansible).</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-blue-700 rounded-full border-2 border-white"></div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-1/2 pr-8 text-right">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
+                                <h3 class="text-xl font-semibold text-blue-700">Day 3: Deep Dive & PCAP</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Interview URDI/FDP Managers. <strong>A2:</strong> Initiate Full Packet Capture on URDI segments.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-blue-700 rounded-full border-2 border-white"></div>
+                    </div>
+
+                    <div class="flex items-start flex-row-reverse">
+                        <div class="flex-shrink-0 w-1/2 pl-8 text-left">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-r-4 border-blue-500">
+                                <h3 class="text-xl font-semibold text-blue-700">Day 4: Network Analysis</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Interview Network/Security Teams. <strong>A2:</strong> Deep Dive PCAP Analysis (ASTERIX/ADS-B).</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-blue-700 rounded-full border-2 border-white"></div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-1/2 pr-8 text-right">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
+                                <h3 class="text-xl font-semibold text-green-700">Day 5: Correlation</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Review Hardening Results. <strong>A2:</strong> Correlate Nessus Patch Reports (Plugin 66334).</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-green-700 rounded-full border-2 border-white"></div>
+                    </div>
+
+                    <div class="flex items-start flex-row-reverse">
+                        <div class="flex-shrink-0 w-1/2 pl-8 text-left">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-r-4 border-green-500">
+                                <h3 class="text-xl font-semibold text-green-700">Day 6: Draft Findings</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Draft Findings, Prioritize Risk. <strong>A2:</strong> Compile & Normalize Technical Evidence.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-green-700 rounded-full border-2 border-white"></div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-1/2 pr-8 text-right">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
+                                <h3 class="text-xl font-semibold text-green-700">Day 7: Finalize Report</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Draft Recommendations (Policy). <strong>A2:</strong> Develop System Playbook Templates.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-green-700 rounded-full border-2 border-white"></div>
+                    </div>
+                    
+                    <div class="flex items-start flex-row-reverse">
+                        <div class="flex-shrink-0 w-1/2 pl-8 text-left">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-r-4 border-green-500">
+                                <h3 class="text-xl font-semibold text-green-700">Day 8: Delivery</h3>
+                                <p class="text-sm text-gray-600"><strong>A1:</strong> Stakeholder Briefing. <strong>A2:</strong> Finalize Remediation Action Plan.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -ml-2 w-4 h-4 bg-green-700 rounded-full border-2 border-white"></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold text-blue-900 mb-3 text-center">4. Assessment Methods & Focus</h2>
+            <p class="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-8">The zero-impact mandate requires a focus on passive data collection and process verification. The team's effort is split between technical analysis (network and config) and human analysis (interviews and documentation).</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4 text-center">Assessment Effort Breakdown</h3>
+                    <div class="chart-container">
+                        <canvas id="effortChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-2">Key Data Collection Pillars</h3>
+                    <div class="bg-white rounded-lg shadow-md p-5">
+                        <h4 class="text-xl font-semibold text-gray-800">Network Packet Analysis (30%)</h4>
+                        <p class="text-gray-600">Passively capture traffic (Wireshark, Zeek) to find anomalies and analyze insecure protocols like ASTERIX/ADS-B.</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-5">
+                        <h4 class="text-xl font-semibold text-gray-800">Config & Log Review (30%)</h4>
+                        <p class="text-gray-600">Validate system hardening (Ansible), patch status (Nessus reports), and file integrity (FIM logs).</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-5">
+                        <h4 class="text-xl font-semibold text-gray-800">System Owner Interviews (25%)</h4>
+                        <p class="text-gray-600">Validate documented controls, DR plans, and change management maturity with key personnel.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold text-blue-900 mb-3 text-center">5. Core Focus Areas (The Playbooks)</h2>
+            <p class="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-8">To ensure depth, the assessment uses three specific "playbooks" to audit the most critical components of the LETVIS architecture.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">Network Infrastructure</h3>
+                    <p class="text-gray-600">Focuses on segmentation efficacy (IT vs. OT), passive data flow mapping, and verifying compensating controls for insecure protocols (ASTERIX).</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">LETVIS Core (UNIX/Linux)</h3>
+                    <p class="text-gray-600">Focuses on COTS hardening, auditing user privileges, validating log management, and correlating patch status with FIM logs.</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-red-500">
+                    <h3 class="text-xl font-semibold text-red-700 mb-2">URDI & FDP Integrity</h3>
+                    <p class="text-gray-600">The safety-critical focus. Prioritizes data integrity, input validation, access control on FDP binaries, and failover/redundancy testing.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="mb-12">
+            <h2 class="text-3xl font-semibold text-blue-900 mb-3 text-center">6. Beyond the Obvious: Critical Gaps</h2>
+            <p class="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-8">A technical audit is incomplete. The plan focuses on identifying systemic gaps that represent the highest risk to operational safety.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-yellow-100 rounded-lg shadow-md p-5 border-l-4 border-yellow-500">
+                    <div class="text-4xl mb-2">⚠️</div>
+                    <h3 class="text-xl font-semibold text-yellow-800 mb-1">Safety/Cyber Integration</h3>
+                    <p class="text-yellow-700 text-sm">The DO-326A gap. Risk must be scored by safety impact, not just CVSS. A data integrity vulnerability is a safety hazard.</p>
+                </div>
+                <div class="bg-yellow-100 rounded-lg shadow-md p-5 border-l-4 border-yellow-500">
+                    <div class="text-4xl mb-2">🔗</div>
+                    <h3 class="text-xl font-semibold text-yellow-800 mb-1">External Interfaces</h3>
+                    <p class="text-yellow-700 text-sm">The ADS-B gap. A hardened system is still vulnerable if it ingests corrupted data from unauthenticated external feeds.</p>
+                </div>
+                <div class="bg-yellow-100 rounded-lg shadow-md p-5 border-l-4 border-yellow-500">
+                    <div class="text-4xl mb-2">🔒</div>
+                    <h3 class="text-xl font-semibold text-yellow-800 mb-1">Physical Security</h3>
+                    <p class="text-yellow-700 text-sm">The foundational gap. Unsecured network closets or consoles bypass all digital defenses and must be part of the review.</p>
+                </div>
+                <div class="bg-yellow-100 rounded-lg shadow-md p-5 border-l-4 border-yellow-500">
+                    <div class="text-4xl mb-2">📜</div>
+                    <h3 class="text-xl font-semibold text-yellow-800 mb-1">Policy & Governance</h3>
+                    <p class="text-yellow-700 text-sm">The maturity gap. Technical flaws are symptoms of policy failure, like no continuous monitoring cadence or OT-specific training.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-3xl font-semibold text-blue-900 mb-3 text-center">7. Risk & Actionable Recommendations</h2>
+            <p class="text-lg text-center text-gray-700 max-w-3xl mx-auto mb-8">The final output is not just a list of findings, but a prioritized, safety-weighted risk matrix and a strategic roadmap for building sustainable resilience.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Safety-Weighted Risk Matrix</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-100 text-gray-600">
+                                <tr>
+                                    <th class="p-3 font-semibold">Risk Level</th>
+                                    <th class="p-3 font-semibold">Criteria</th>
+                                    <th class="p-3 font-semibold">Deadline</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr class="bg-red-100">
+                                    <td class="p-3 font-bold text-red-800">CRITICAL</td>
+                                    <td class="p-3 text-sm text-red-700">High Likelihood & Catastrophic Operational Impact (Loss of separation, flight hazard).</td>
+                                    <td class="p-3 font-medium text-red-800">Immediate (72h)</td>
+                                </tr>
+                                <tr class="bg-orange-100">
+                                    <td class="p-3 font-bold text-orange-800">HIGH</td>
+                                    <td class="p-3 text-sm text-orange-700">Medium Likelihood & High Impact (Prolonged service disruption, data corruption).</td>
+                                    <td class="p-3 font-medium text-orange-800">30 days</td>
+                                </tr>
+                                <tr class="bg-yellow-100">
+                                    <td class="p-3 font-bold text-yellow-800">MODERATE</td>
+                                    <td class="p-3 text-sm text-yellow-700">Medium Likelihood & Medium Impact (Policy violation, config drift).</td>
+                                    <td class="p-3 font-medium text-yellow-800">90 days</td>
+                                </tr>
+                                <tr class="bg-green-100">
+                                    <td class="p-3 font-bold text-green-800">LOW</td>
+                                    <td class="p-3 text-sm text-green-700">Low Likelihood & Low Impact (Documentation gaps, minor hardening deficit).</td>
+                                    <td class="p-3 font-medium text-green-800">180+ days</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Key Recommendations</h3>
+                    <ol class="list-decimal list-outside space-y-3 pl-5 text-gray-700">
+                        <li><strong>Mandate Safety/Cyber Integration:</strong> Formally implement the DO-326A risk process (SRAP), linking every cyber vulnerability to its maximum credible operational safety consequence.</li>
+                        <li><strong>Implement Compensating Controls:</strong> Deploy protocol-aware Network Detection (NDR) tools to monitor ASTERIX/ADS-B traffic for spoofing.</li>
+                        <li><strong>Establish Config Baselines:</strong> Define and document the "known good state" for all UNIX/Linux systems and use FIM tools to monitor for configuration drift.</li>
+                        <li><strong>Strengthen Patch Validation:</strong> Update patch management to require verification using credentialed scan data (Nessus) to ensure patches are fully enabled, not just installed.</li>
+                        <li><strong>Transition to Continuous Monitoring:</strong> Move from "snap-shot" assessments to a continuous improvement framework with regular DR testing and ongoing staff training.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="text-center p-6 mt-10 border-t border-gray-200">
+        <p class="text-sm text-gray-500">This infographic provides a high-level visual summary of the "Expert Security Assessment Plan for the LETVIS Air Traffic Management System."</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const effortChartCtx = document.getElementById('effortChart');
+            if (effortChartCtx) {
+                const originalLabels = ['Network Packet Analysis', 'Config & Log Review', 'System Owner Interviews', 'Documentation & Prep'];
+                
+                const wrappedLabels = originalLabels.map(label => {
+                    if (label.length > 16) {
+                        const words = label.split(' ');
+                        let line = '';
+                        const lines = [];
+                        for (let i = 0; i < words.length; i++) {
+                            if ((line + words[i]).length > 16 && line.length > 0) {
+                                lines.push(line.trim());
+                                line = words[i] + ' ';
+                            } else {
+                                line += words[i] + ' ';
+                            }
+                        }
+                        lines.push(line.trim());
+                        return lines;
+                    }
+                    return label;
+                });
+
+                new Chart(effortChartCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: wrappedLabels,
+                        datasets: [{
+                            label: 'Assessment Effort',
+                            data: [30, 30, 25, 15],
+                            backgroundColor: [
+                                '#0055B7',
+                                '#0077FF',
+                                '#3399FF',
+                                '#99CCFF'
+                            ],
+                            borderColor: '#ffffff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                          return label.join(' ');
+                                        } else {
+                                          return label;
+                                        }
+                                    },
+                                    label: function(context) {
+                                        return ` ${context.formattedValue}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
