@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harald Hardrada: The Last Viking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/2.28.0/date-fns.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-date-fns/2.0.0/chartjs-adapter-date-fns.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link.active {
+            font-weight: 700;
+            color: #0c4a6e; 
+            border-bottom-color: #0c4a6e;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Amber, Stone, Sky Blue Accent) -->
+    <!-- Application Structure Plan: A single-page biographical app with a sticky top navigation bar (Overview, Exile, King, 1066) that allows users to jump to chronological sections. This structure guides the user through Hardrada's complex life, starting with a direct answer to their query ('was he a Dane?') in the 'Overview' section. It then provides the crucial context for this question (his long war *against* the Danes) in the 'King of Norway' section. This chronological flow is the most logical and user-friendly way to present a historical biography and make the information digestible. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Hardrada's core identity (name, origin, title, dates). Goal: Inform/Answer. Viz/Presentation: HTML 'Key Facts' card. Interaction: None (static). Justification: Provides an immediate, clear answer to the user's primary query. Method: HTML/Tailwind.
+        2. Report Info: Hardrada's 15-year exile journey. Goal: Organize/Inform. Viz/Presentation: HTML/Tailwind 'Path of Exile' diagram. Interaction: None (static). Justification: Visually represents his complex journey (Norway -> Kievan Rus' -> Constantinople -> Norway) in a simple, linear way without using maps (NO SVG). Method: HTML/Tailwind flexbox.
+        3. Report Info: The 1066 invasions of England. Goal: Compare/Change. Viz/Presentation: Chart.js Horizontal Bar Chart (Gantt-style). Interaction: Tooltips on hover. Justification: This is the best way to show the compressed, chaotic timeline of 1066, visually comparing the overlapping reigns and invasions of the three main contenders (Godwinson, Hardrada, William). Library/Method: Chart.js (Canvas) with date-fns adapter.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-amber-50 text-stone-800 antialiased">
+
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-sky-900">Harald Hardrada</h1>
+                <div class="hidden sm:flex space-x-6">
+                    <a href="#overview" class="nav-link text-stone-600 hover:text-sky-800 border-b-2 border-transparent hover:border-sky-800 transition-all pb-1" data-section="overview">Overview</a>
+                    <a href="#exile" class="nav-link text-stone-600 hover:text-sky-800 border-b-2 border-transparent hover:border-sky-800 transition-all pb-1" data-section="exile">The Long Exile</a>
+                    <a href="#king" class="nav-link text-stone-600 hover:text-sky-800 border-b-2 border-transparent hover:border-sky-800 transition-all pb-1" data-section="king">King of Norway</a>
+                    <a href="#1066" class="nav-link text-stone-600 hover:text-sky-800 border-b-2 border-transparent hover:border-sky-800 transition-all pb-1" data-section="1066">The Fateful Year: 1066</a>
+                </div>
+                <div class="sm:hidden">
+                    <select id="mobile-nav" class="border border-stone-300 rounded-md p-2 bg-white text-stone-700">
+                        <option value="overview">Overview</option>
+                        <option value="exile">The Long Exile</option>
+                        <option value="king">King of Norway</option>
+                        <option value="1066">The Fateful Year: 1066</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 sm:p-8 space-y-16">
+
+        <section id="overview" class="pt-16 -mt-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                <div class="md:col-span-2 space-y-4">
+                    <h2 class="text-3xl font-bold text-sky-900 border-b-4 border-amber-300 pb-2">Overview: The Last Great Viking</h2>
+                    <p class="text-lg text-stone-700">
+                        This application explores the life of Harald Hardrada, one of history's most formidable figures, often called "the last great Viking." His life was a sweeping saga of exile, warfare, and power that spanned from Scandinavia to the heart of the Byzantine Empire and culminated in a fateful invasion of England.
+                    </p>
+                    <p class="text-lg text-stone-700">
+                        Your research query is the perfect starting point: <strong class="text-sky-800">Was he a Dane?</strong> The answer is simple, but the context reveals a major part of his life's story.
+                    </p>
+                </div>
+                <div class="md:col-span-1 bg-white rounded-lg shadow-lg p-6 border-t-4 border-sky-800">
+                    <h3 class="text-xl font-bold text-stone-900 mb-4">Key Facts</h3>
+                    <ul class="space-y-3">
+                        <li class="flex flex-col">
+                            <span class="text-sm font-semibold text-stone-500">Full Name</span>
+                            <span class="text-lg text-stone-800">Harald Sigurdsson</span>
+                        </li>
+                        <li class="flex flex-col">
+                            <span class="text-sm font-semibold text-stone-500">Epithet</span>
+                            <span class="text-lg text-stone-800">Hardrada ("Hard Ruler")</span>
+                        </li>
+                        <li class="flex flex-col">
+                            <span class="text-sm font-semibold text-stone-500">Nationality</span>
+                            <span class="text-2xl font-bold text-sky-800">Norwegian</span>
+                        </li>
+                        <li class="flex flex-col">
+                            <span class="text-sm font-semibold text-stone-500">Born / Died</span>
+                            <span class="text-lg text-stone-800">c. 1015 – 25 Sept 1066</span>
+                        </li>
+                        <li class="flex flex-col">
+                            <span class="text-sm font-semibold text-stone-500">Title</span>
+                            <span class="text-lg text-stone-800">King of Norway (1046–1066)</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="exile" class="pt-16 -mt-16">
+            <h2 class="text-3xl font-bold text-sky-900 border-b-4 border-amber-300 pb-2 mb-6">The Long Exile (1030–1045)</h2>
+            <p class="text-lg text-stone-700 mb-8 max-w-4xl">
+                At age 15, Harald fought with his half-brother, King Olaf II, at the Battle of Stiklestad. Olaf was killed, and Harald was forced to flee Norway. This began a 15-year odyssey as a mercenary and military commander that would make him one of the wealthiest and most feared warriors of his time. This journey took him across continents, from the fledgling states of Rus' to the opulent heart of the Byzantine Empire.
+            </p>
+            
+            <h3 class="text-2xl font-semibold text-stone-800 mb-4">Path of the Exile</h3>
+            <div class="flex flex-col md:flex-row justify-around items-center p-6 bg-white rounded-lg shadow-md space-y-4 md:space-y-0 md:space-x-4">
+                <div class="text-center">
+                    <span class="text-2xl font-bold text-sky-800">Norway</span>
+                    <p class="text-sm text-stone-600">(1030: Fled after Battle of Stiklestad)</p>
+                </div>
+                <span class="text-4xl text-amber-500 font-light transform rotate-90 md:rotate-0">→</span>
+                <div class="text-center">
+                    <span class="text-2xl font-bold text-sky-800">Kievan Rus'</span>
+                    <p class="text-sm text-stone-600">(Served Yaroslav the Wise)</p>
+                </div>
+                <span class="text-4xl text-amber-500 font-light transform rotate-90 md:rotate-0">→</span>
+                <div class="text-center">
+                    <span class="text-2xl font-bold text-sky-800">Constantinople</span>
+                    <p class="text-sm text-stone-600">(Joined Varangian Guard c. 1034)</p>
+                </div>
+                <span class="text-4xl text-amber-500 font-light transform rotate-90 md:rotate-0">→</span>
+                <div class="text-center">
+                    <span class="text-2xl font-bold text-sky-800">Norway</span>
+                    <p class="text-sm text-stone-600">(Returned c. 1045 with vast wealth)</p>
+                </div>
+            </div>
+
+            <div class="mt-8 p-6 bg-white rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold text-stone-800 mb-2">Commander of the Varangian Guard</h3>
+                <p class="text-stone-700">
+                    Harald's career peaked in Constantinople, where he rose to command the Varangian Guard—an elite unit of Norsemen who served as the personal bodyguards of the Byzantine Emperor. He fought in campaigns across the Mediterranean, in Sicily, Bulgaria, and the Holy Land, amassing an enormous fortune that he shipped back to Yaroslav in Kievan Rus' for safekeeping. This wealth would later fund his claim to the Norwegian throne.
+                </p>
+            </div>
+        </section>
+
+        <section id="king" class="pt-16 -mt-16">
+            <h2 class="text-3xl font-bold text-sky-900 border-b-4 border-amber-300 pb-2 mb-6">King of Norway (1046–1066)</h2>
+            <p class="text-lg text-stone-700 mb-8 max-w-4xl">
+                Harald returned to Norway in 1045, his reputation and wealth so great that his nephew, King Magnus the Good, was forced to make him co-ruler. When Magnus died a year later, Harald became the sole King of Norway. His reign was marked by the centralization of power, the founding of the city of Oslo, and a long, brutal war that directly addresses your query's confusion.
+            </p>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-sky-800">
+                <h3 class="text-2xl font-semibold text-stone-800 mb-2">The War Against the Danes</h3>
+                <p class="text-stone-700">
+                    Far from being a Dane, Harald Hardrada spent nearly two decades (1048–1064) fighting a relentless war *against* the King of Denmark, Sweyn II. Harald believed he had a claim to the Danish throne through his nephew Magnus, but the Danes refused to accept him. This long, attritional war, consisting mostly of brutal coastal raids, defined much of his reign and cemented the animosity between the two kingdoms. He ultimately failed to conquer Denmark, signing a peace treaty with Sweyn in 1064, just two years before his death.
+                </p>
+            </div>
+        </section>
+        
+        <section id="1066" class="pt-16 -mt-16">
+            <h2 class="text-3xl font-bold text-sky-900 border-b-4 border-amber-300 pb-2 mb-6">The Fateful Year: 1066</h2>
+            <p class="text-lg text-stone-700 mb-8 max-w-4xl">
+                With peace secured with Denmark, Hardrada turned his attention to a greater prize: England. When King Edward the Confessor died in January 1066, Hardrada laid claim to the throne, launching a massive invasion of northern England. This decision set the stage for one of the most famous and chaotic years in history, marked by three kings vying for one crown. His invasion is often seen as the climactic end of the Viking Age.
+            </p>
+
+            <h3 class="text-2xl font-semibold text-stone-800 mb-4 text-center">Timeline of 1066 Contenders</h3>
+            <p class="text-stone-700 mb-4 text-center max-w-3xl mx-auto">
+                The chart below visualizes the chaotic year. It shows the reign of Harold Godwinson (King of England) and the overlapping invasions from Harald Hardrada (Norway) and William (Normandy). Hover over the bars to see the key events that sealed the fate of all three men.
+            </p>
+            
+            <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+                <div class="chart-container">
+                    <canvas id="1066-timeline-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center p-8 mt-16 border-t border-amber-200">
+        <p class="text-stone-500">Interactive Biography created from research on Harald Hardrada.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const navLinks = document.querySelectorAll('a.nav-link');
+            const sections = document.querySelectorAll('section');
+            const mobileNav = document.getElementById('mobile-nav');
+
+            function scrollToSection(id) {
+                const section = document.getElementById(id);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = link.getAttribute('href').substring(1);
+                    scrollToSection(id);
+                    mobileNav.value = id;
+                });
+            });
+
+            mobileNav.addEventListener('change', () => {
+                scrollToSection(mobileNav.value);
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        document.querySelectorAll('a.nav-link').forEach(link => {
+                            link.classList.toggle('active', link.dataset.section === id);
+                        });
+                        mobileNav.value = id;
+                    }
+                });
+            }, { rootMargin: '-20% 0px -70% 0px', threshold: 0.1 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            const ctx = document.getElementById('1066-timeline-chart').getContext('2d');
+            const data = {
+                labels: ['Harold Godwinson (England)', 'Harald Hardrada (Norway)', 'William (Normandy)'],
+                datasets: [{
+                    label: 'Reign / Invasion',
+                    data: [
+                        [new Date('1066-01-06'), new Date('1066-10-14')],
+                        [new Date('1066-09-08'), new Date('1066-09-25')],
+                        [new Date('1066-09-28'), new Date('1066-10-14')]
+                    ],
+                    backgroundColor: [
+                        'rgba(234, 179, 8, 0.6)', 
+                        'rgba(12, 74, 110, 0.6)', 
+                        'rgba(217, 70, 239, 0.6)' 
+                    ],
+                    borderColor: [
+                        'rgb(234, 179, 8)',
+                        'rgb(12, 74, 110)',
+                        'rgb(217, 70, 239)'
+                    ],
+                    borderWidth: 1,
+                    barPercentage: 0.5
+                }]
+            };
+
+            const tooltips = {
+                callbacks: {
+                    label: function(context) {
+                        const d = context.raw;
+                        const start = new Date(d[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        const end = new Date(d[1]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        let label = context.dataset.label + ': ' + start + ' – ' + end;
+                        
+                        if (context.label.startsWith('Harold Godwinson')) {
+                            return `Reign: Jan 6 – Oct 14 (Killed at Hastings)`;
+                        }
+                        if (context.label.startsWith('Harald Hardrada')) {
+                            return `Invasion: Sept 8 – Sept 25 (Killed at Stamford Bridge)`;
+                        }
+                        if (context.label.startsWith('William')) {
+                            return `Invasion: Sept 28 – Oct 14 (Won at Hastings)`;
+                        }
+                        return label;
+                    }
+                }
+            };
+
+            const config = {
+                type: 'bar',
+                data: data,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'month',
+                                displayFormats: {
+                                    month: 'MMM'
+                                }
+                            },
+                            min: new Date('1066-01-01'),
+                            max: new Date('1066-11-01'),
+                            title: {
+                                display: true,
+                                text: 'Month (1066)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                autoSkip: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: tooltips
+                    }
+                }
+            };
+            
+            new Chart(ctx, config);
+        });
+    </script>
+</body>
+</html>
