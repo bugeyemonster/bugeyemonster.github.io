@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Analysis: Deconstructing the Azure Blob Storage Scam</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --code-bg: #2d2d2d;
+            --code-text: #f8f8f2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-top: 35px;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 25px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        .artifact-box {
+            background-color: #eef2f5;
+            border: 1px solid #d1d9e6;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .artifact-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        code {
+            background-color: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        .diagram {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #fff;
+            border: 1px dashed #ccc;
+        }
+
+        .highlight-red {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <span class="tag">Security Research</span>
+            <span class="tag" style="background-color: #e74c3c;">Case Study</span>
+            <h1>Anatomy of a Tech Support Scam: The Azure Blob Storage Exploit</h1>
+            <p><strong>Date:</strong> November 26, 2025 | <strong>Topic:</strong> Infrastructure Abuse & Phishing</p>
+        </header>
+
+        <section>
+            <p>Modern tech support scams have evolved beyond simple cold calling. They now rely on complex "Living off the Land" (LotL) techniques, utilizing legitimate cloud infrastructure to bypass security filters and gain victim trust. This report analyzes a specific campaign utilizing Microsoft Azure's Blob Storage to host "Browser Locker" (Browlock) pages.</p>
+        </section>
+
+        <section>
+            <h2>1. The Artifacts</h2>
+            <p>The following Indicators of Compromise (IoCs) were identified in this specific campaign. The campaign utilizes a dual-threat mechanism: a high-reputation URL hosting a malicious payload.</p>
+            
+            <div class="artifact-box">
+                <span class="artifact-label">Observed Malicious URL:</span>
+                <span class="highlight-red">xxxjkmajns7y4e.z13.web.core.windows.net</span>
+            </div>
+            
+            <div class="artifact-box">
+                <span class="artifact-label">Associated Call Center Number:</span>
+                <strong>+1 (855) 568-3520</strong>
+            </div>
+        </section>
+
+        <section>
+            <h2>2. Infrastructure Analysis: Why "windows.net"?</h2>
+            <p>The success of this scam relies heavily on the domain structure. The URL <code>web.core.windows.net</code> is not a spoofed domain; it is a legitimate endpoint provided by Microsoft for <strong>Azure Blob Storage</strong> static websites.</p>
+
+            <h3>The URL Breakdown</h3>
+            <p>To understand the exploit, we must dissect the URL syntax:</p>
+            <pre>
+[xxxjkmajns7y4e] . [z13] . [web.core.windows.net]
+       |             |              |
+Account Name      Zone/    Root Azure Domain
+(Attacker Ctrl)   Cluster  (High Reputation)
+            </pre>
+
+            <ul>
+                <li><strong>The Root (web.core.windows.net):</strong> This is trusted by browser filters (SmartScreen, Safe Browsing) because it hosts millions of legitimate business applications.</li>
+                <li><strong>The Account Name (xxxjkmajns7y4e):</strong> The attacker creates a free or low-cost Azure Storage account. They can name this whatever they want. In this case, a random string is used to avoid detection algorithms that might flag keywords like "support" or "alert."</li>
+                <li><strong>The Subdomain Takeover/Abuse Vector:</strong> While often referred to as "Subdomain Squatting," this is technically <strong>Service Abuse</strong>. The attacker provisions a legitimate resource. However, "Dangling DNS" takeovers are also possible here if a legitimate company deletes their Azure resource but leaves a CNAME record pointing to it. Attackers scan for these empty pointers and register the matching Azure account name to "hijack" the subdomain.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. The "Trust Chain" Exploitation</h2>
+            <p>The primary goal of using Azure infrastructure is <strong>Reputation Hijacking</strong>. Security mechanisms and human psychology are exploited in three ways:</p>
+            
+            <ol>
+                <li><strong>SSL Validity:</strong> Because the site is hosted on Microsoft's own servers, it is served with a valid wildcard SSL certificate issued by Microsoft. The "Padlock" icon appears in the browser, falsely signaling safety to the victim.</li>
+                <li><strong>Domain Whitelisting:</strong> Corporate firewalls and consumer antivirus software often whitelist <code>*.windows.net</code> to prevent breaking legitimate update services or business tools.</li>
+                <li><strong>Visual Authenticity:</strong> When a user sees a "Windows Security" warning coming from a URL containing "windows.net," the cognitive dissonance is reduced. The URL reinforces the fake narrative.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>4. The Payload: "Browlock" Scripts</h2>
+            <p>Upon visiting the URL, the static HTML page executes JavaScript designed to freeze the browser experience, forcing the user to call the support number (855-568-3520).</p>
+            <p>Common techniques utilized in the source code of this specific page type include:</p>
+            <ul>
+                <li><strong>History Looping:</strong> Manipulating the browser history API to prevent the "Back" button from working.</li>
+                <li><strong>Cursor Trapping:</strong> Using full-screen API abuse to hide the mouse cursor or restrict it to the fake alert box.</li>
+                <li><strong>Infinite Loops:</strong> Spawning unlimited alert dialogs (<code>alert()</code> or <code>confirm()</code> loops) that reappear instantly if dismissed.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. Conclusion</h2>
+            <p>The campaign utilizing <code>xxxjkmajns7y4e.z13.web.core.windows.net</code> represents a shift from compromised WordPress sites to legitimate cloud infrastructure. By abusing the democratized nature of cloud storage, scammers inherit the trust of the platform provider (Microsoft), making detection and blocking significantly more difficult for automated systems.</p>
+        </section>
+
+        <footer>
+            <p><em>Disclaimer: This post is for educational and research purposes only. The URL and phone number listed are confirmed scam indicators associated with malicious activity.</em></p>
+        </footer>
+    </div>
+
+</body>
+</html>
