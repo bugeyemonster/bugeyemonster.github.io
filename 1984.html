@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nineteen Eighty-Four: A Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'party-red': '#cc0000',
+                        'oceania-grey': '#f4f4f4',
+                        'telescreen-glow': '#e0ffe0',
+                        'paper-yellow': '#fffdf5',
+                    },
+                    fontFamily: {
+                        'headline': ['Cinzel', 'serif'],
+                        'body': ['Merriweather', 'serif'],
+                        'mono': ['Share Tech Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #d4d4d4;
+        }
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 4rem;
+            line-height: 3.5rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            color: #cc0000;
+            font-family: 'Cinzel', serif;
+        }
+        .glitch-effect:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #cc0000;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #cc0000; 
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="border-b border-gray-800 bg-black/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-white font-headline font-bold text-xl tracking-widest uppercase">
+                        <i class="fas fa-eye text-party-red mr-2"></i> Literature<span class="text-party-red">Review</span>
+                    </span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium font-mono uppercase tracking-wider">Archives</a>
+                        <a href="#" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium font-mono uppercase tracking-wider">Analysis</a>
+                        <a href="#" class="bg-party-red hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium font-mono uppercase tracking-wider transition-colors duration-300">Subscribe</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            
+            <!-- Header Section -->
+            <header class="mb-12 text-center">
+                <div class="inline-block px-3 py-1 mb-4 text-xs font-mono text-party-red border border-party-red uppercase tracking-widest">
+                    Dystopian Classics
+                </div>
+                <h1 class="text-4xl md:text-6xl font-headline font-bold text-white mb-6 leading-tight">
+                    Nineteen Eighty-Four
+                </h1>
+                <h2 class="text-xl md:text-2xl text-gray-400 font-light mb-8 italic">
+                    A summary of George Orwell's vision of a totalitarian future.
+                </h2>
+                
+                <div class="flex items-center justify-center space-x-6 text-sm text-gray-500 font-mono border-y border-gray-800 py-4 max-w-lg mx-auto">
+                    <div class="flex items-center">
+                        <i class="far fa-calendar-alt mr-2"></i>
+                        <span>April 4, 1984</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="far fa-clock mr-2"></i>
+                        <span>5 min read</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-pen-nib mr-2"></i>
+                        <span>W. Smith</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Featured "Image" Area (CSS Art/Icon) -->
+            <div class="mb-12 bg-gray-900 rounded-lg p-12 text-center border border-gray-800 shadow-2xl relative overflow-hidden group">
+                <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMzMzMiLz48L3N2Zz4=')] opacity-20"></div>
+                <div class="relative z-10 transition-transform duration-700 transform group-hover:scale-105">
+                    <i class="fas fa-eye text-9xl text-gray-800 group-hover:text-party-red transition-colors duration-500"></i>
+                    <div class="mt-4 font-headline text-2xl font-bold uppercase tracking-[0.5em] text-gray-600 group-hover:text-white transition-colors duration-500">
+                        Big Brother Is Watching
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article Body -->
+            <div class="prose prose-lg prose-invert mx-auto font-body text-gray-300 leading-relaxed">
+                
+                <p class="drop-cap mb-6">
+                    George Orwell's <span class="text-white font-semibold italic">"Nineteen Eighty-Four"</span> is a chilling dystopian novel published in 1949. It presents a vision of a totalitarian future where a single, all-powerful political party has complete control over every aspect of human life.
+                </p>
+
+                <h3 class="text-2xl font-headline text-white mt-12 mb-4 border-l-4 border-party-red pl-4">The World of Oceania</h3>
+                <p class="mb-6">
+                    The story is set in <strong>Airstrip One</strong> (formerly Great Britain), a province of the superstate Oceania. The world is in a constant state of war, and society is governed by "The Party," which is led by a mysterious figure known as <span class="text-party-red font-bold uppercase">Big Brother</span>. The Party maintains its power through a combination of constant surveillance, propaganda, and brutal psychological and physical manipulation.
+                </p>
+
+                <blockquote class="border-l-4 border-party-red pl-6 py-2 my-8 italic text-xl text-gray-400 bg-gray-900 rounded-r-lg">
+                    "War is Peace. Freedom is Slavery. Ignorance is Strength."
+                </blockquote>
+
+                <h3 class="text-2xl font-headline text-white mt-12 mb-4 border-l-4 border-party-red pl-4">The Rebellion of Winston Smith</h3>
+                <p class="mb-6">
+                    The protagonist of the novel is <strong>Winston Smith</strong>, a low-ranking member of the Outer Party. Winston works in the <em>Ministry of Truth</em>, where his job is to rewrite historical records to align with the Party's ever-changing version of reality. Disillusioned with his oppressive existence and the Party's control over truth, Winston begins to secretly rebel. He starts by committing "thoughtcrime"—the act of holding unspoken beliefs that contradict the Party's ideology—and illegally purchases a diary to record his private thoughts.
+                </p>
+                
+                <p class="mb-6">
+                    Winston's rebellion escalates when he begins a clandestine affair with <strong>Julia</strong>, a free-spirited young woman who also works at the Ministry of Truth. Their relationship is a dangerous act of defiance, as personal loyalty and love are forbidden by the Party, which seeks to redirect all human emotion towards the state.
+                </p>
+
+                <h3 class="text-2xl font-headline text-white mt-12 mb-4 border-l-4 border-party-red pl-4">The Trap and Betrayal</h3>
+                <p class="mb-6">
+                    Driven by a desire to overthrow the regime, Winston and Julia seek out the mythical "Brotherhood," an underground resistance movement supposedly led by <strong>Emmanuel Goldstein</strong>, the Party's arch-nemesis. Their search leads them to O'Brien, a charismatic and intelligent member of the Inner Party whom Winston believes is secretly part of the resistance.
+                </p>
+
+                <div class="bg-gray-800 p-6 rounded-lg my-8 border border-gray-700">
+                    <p class="mb-0 font-mono text-sm text-green-400">
+                        <span class="text-green-600">></span> SYSTEM ALERT: THOUGHT POLICE DEPLOYED<br>
+                        <span class="text-green-600">></span> SUBJECT: SMITH, WINSTON<br>
+                        <span class="text-green-600">></span> STATUS: APPREHENDED
+                    </p>
+                </div>
+
+                <p class="mb-6">
+                    However, O'Brien is actually a loyal agent of the <strong>Thought Police</strong>. Winston and Julia are inevitably captured and taken to the dreaded <em>Ministry of Love</em>, which is essentially the Party's torture and re-education center. Here, Winston is subjected to months of systematic torture by O'Brien, who aims not just to make Winston confess, but to completely break his spirit and reshape his perception of reality. The climax of his torture takes place in <strong>Room 101</strong>, where he is forced to confront his greatest fear.
+                </p>
+
+                <h3 class="text-2xl font-headline text-white mt-12 mb-4 border-l-4 border-party-red pl-4">The Final Victory</h3>
+                <p class="mb-6">
+                    In the end, the Party succeeds. Winston is released back into society as a broken man, his independent spirit crushed. He no longer loves Julia; his mind has been completely reshaped, and he has learned to genuinely love Big Brother. 
+                </p>
+                
+                <p class="text-xl font-headline text-center mt-12 mb-12 text-gray-500">
+                    The novel concludes with the haunting image of Winston's complete and utter submission to the Party's absolute power.
+                </p>
+            </div>
+
+            <!-- Footer Meta -->
+            <div class="border-t border-gray-800 mt-16 pt-8">
+                <div class="flex flex-wrap gap-2 mb-8">
+                    <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs uppercase tracking-wide font-bold hover:bg-party-red hover:text-white transition-colors cursor-pointer">#Dystopia</span>
+                    <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs uppercase tracking-wide font-bold hover:bg-party-red hover:text-white transition-colors cursor-pointer">#Orwell</span>
+                    <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs uppercase tracking-wide font-bold hover:bg-party-red hover:text-white transition-colors cursor-pointer">#Totalitarianism</span>
+                    <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs uppercase tracking-wide font-bold hover:bg-party-red hover:text-white transition-colors cursor-pointer">#ClassicLit</span>
+                </div>
+                
+                <!-- Author Bio -->
+                <div class="bg-gray-900 rounded-xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 border border-gray-800">
+                    <div class="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 border-2 border-party-red overflow-hidden">
+                        <i class="fas fa-user text-2xl text-gray-400"></i>
+                    </div>
+                    <div class="text-center sm:text-left">
+                        <h4 class="text-white font-headline font-bold text-lg">About the Reviewer</h4>
+                        <p class="text-gray-400 text-sm mt-2">
+                            A dedicated archivist of classic literature, exploring the darker corners of speculative fiction. Always doubleplusgood at summarizing complex narratives.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-gray-800 py-12 mt-auto">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="mb-6">
+                <i class="fas fa-eye text-party-red text-2xl mb-4 block"></i>
+                <p class="text-gray-500 font-mono text-sm">
+                    "He who controls the past controls the future. He who controls the present controls the past."
+                </p>
+            </div>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fab fa-twitter text-xl"></i></a>
+                <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fab fa-facebook text-xl"></i></a>
+                <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fab fa-instagram text-xl"></i></a>
+            </div>
+            <p class="text-gray-600 text-xs">
+                &copy; 2024 LiteratureReview. All thoughts are your own (for now).
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
