@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The No-Future Empire: Temporal Extraction Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fdfbf7; color: #333333; }
+        h1, h2, h3, h4, h5, h6, .serif { font-family: 'Merriweather', serif; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; height: 350px; max-height: 400px; }
+        @media (max-width: 768px) { .chart-container { height: 250px; } }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .nav-link.active { border-left-color: #c2410c; color: #c2410c; font-weight: 600; background-color: #fef3c7; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdfbf7; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
+</head>
+<body class="antialiased selection:bg-orange-200 selection:text-orange-900">
+
+    <!-- Chosen Palette: Warm Neutrals & Terracotta (Background: #fdfbf7, Text: #333333, Accents: #c2410c, #4338ca, #15803d) -->
+    <!-- Application Structure Plan: A linear narrative dashboard with a sticky left-navigation sidebar. This structure was chosen because the source report builds a sequential argument (Spatial -> Temporal -> Cultural Symptoms -> Return to Crisis). A scrolling narrative with interactive charts allows the user to absorb the heavy academic theory (Chronocolonization) in digestible, visually supported steps. -->
+    <!-- Visualization & Content Choices: 1. The Pivot: Line chart showing spatial decline (Goal: Inform spatial exhaustion) -> Chart.js. 2. Bond Market: Bar chart of generational debt (Goal: Compare temporal burden) -> Chart.js. 3. Punk Prophecy: Interactive timeline/tabs (Goal: Organize cultural history) -> Vanilla JS + HTML. 4. Return to Territory: Area chart of ecological/debt overshoot causing conflict (Goal: Show relationship/crisis) -> Chart.js. All choices confirm NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <nav class="w-full md:w-64 bg-white md:bg-transparent md:fixed h-auto md:h-screen p-6 md:p-8 border-b md:border-b-0 md:border-r border-stone-200 z-50 flex flex-col justify-between overflow-y-auto">
+            <div>
+                <div class="text-3xl mb-8">⏳</div>
+                <h2 class="serif text-xl font-bold mb-6 text-stone-800">The No-Future Empire</h2>
+                <ul class="space-y-2 text-sm text-stone-500" id="nav-menu">
+                    <li><a href="#intro" class="nav-link block py-2 pl-3 border-l-2 border-transparent hover:text-stone-800 transition-colors">Introduction</a></li>
+                    <li><a href="#spatial" class="nav-link block py-2 pl-3 border-l-2 border-transparent hover:text-stone-800 transition-colors">1. The Spatial Fix</a></li>
+                    <li><a href="#temporal" class="nav-link block py-2 pl-3 border-l-2 border-transparent hover:text-stone-800 transition-colors">2. Temporal Extraction</a></li>
+                    <li><a href="#culture" class="nav-link block py-2 pl-3 border-l-2 border-transparent hover:text-stone-800 transition-colors">3. The Punk Prophecy</a></li>
+                    <li><a href="#territory" class="nav-link block py-2 pl-3 border-l-2 border-transparent hover:text-stone-800 transition-colors">4. Return to Territory</a></li>
+                    <li><a href="#conclusion" class="nav-link block py-2 pl-3 border-l-2 border-transparent hover:text-stone-800 transition-colors">Conclusion</a></li>
+                </ul>
+            </div>
+            <div class="hidden md:block mt-8 pt-6 border-t border-stone-200">
+                <p class="text-xs text-stone-400">Based on the concepts of Temporal Imperialism and Chronocolonization.</p>
+            </div>
+        </nav>
+
+        <main class="flex-1 md:ml-64 p-6 md:p-12 lg:p-24 max-w-5xl">
+            
+            <section id="intro" class="min-h-[80vh] flex flex-col justify-center mb-24 fade-in">
+                <span class="text-orange-600 font-semibold tracking-wider text-sm uppercase mb-4 block">Interactive Thesis Exploration</span>
+                <h1 class="serif text-5xl md:text-6xl font-bold leading-tight mb-6 text-stone-900">
+                    From Settler Colonialism <br>
+                    <span class="text-stone-400 italic font-light">to</span> Temporal Extraction
+                </h1>
+                <p class="text-xl md:text-2xl text-stone-600 mb-8 max-w-3xl leading-relaxed">
+                    When the global map was completely conquered, empires didn't stop expanding. They simply turned the ship of state ninety degrees and began sailing into the future.
+                </p>
+                <div class="bg-stone-100 p-6 rounded-lg border border-stone-200 max-w-3xl">
+                    <p class="text-stone-700 italic">
+                        "You’re describing what sociologists and heterodox economists often call <strong>Temporal Imperialism</strong> or <strong>Chronocolonization</strong>. This application explores how capital switched from conquering new lands to conquering the future through debt and resource depletion."
+                    </p>
+                </div>
+            </section>
+
+            <section id="spatial" class="mb-32 fade-in">
+                <div class="mb-12 border-b border-stone-200 pb-8">
+                    <div class="text-4xl mb-4">🌍</div>
+                    <h2 class="serif text-3xl font-bold mb-4">1. The Pivot: When Empires Ran Out of Space</h2>
+                    <p class="text-lg text-stone-600 leading-relaxed max-w-3xl">
+                        This section explores the transition from traditional geographic expansion to the necessity of finding a new frontier. For centuries, the survival of the economic system relied on the "Spatial Fix"—expanding into new territories for cheap labor and materials. By the late 20th century, decolonization and global saturation made this impossible. We examine how this spatial exhaustion forced a pivot.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="font-bold text-xl mb-4">The Death of the "Spatial Fix"</h3>
+                        <p class="mb-4 text-stone-600">
+                            Geographer David Harvey identified that whenever markets became saturated in the imperial centers, capital moved outward geographically.
+                        </p>
+                        <p class="mb-6 text-stone-600">
+                            However, the 1950s–1970s decolonization movements made traditional territorial occupation politically toxic and economically unviable. The globe was effectively "full." The elite needed a new dumping ground for the pressures of the present.
+                        </p>
+                        <div class="bg-orange-50 border-l-4 border-orange-600 p-4 rounded-r">
+                            <p class="text-sm text-orange-900">
+                                <strong>Interactive Insight:</strong> The chart demonstrates the theoretical collapse of available uncolonized geographic markets compared to the rising need for capital expansion.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+                        <div class="chart-container">
+                            <canvas id="spatialChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-stone-400 mt-4">Conceptual visualization: The closure of geographic frontiers.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="temporal" class="mb-32 fade-in">
+                <div class="mb-12 border-b border-stone-200 pb-8">
+                    <div class="text-4xl mb-4">📜</div>
+                    <h2 class="serif text-3xl font-bold mb-4">2. The Bond Market: The Flag of Temporal Colonies</h2>
+                    <p class="text-lg text-stone-600 leading-relaxed max-w-3xl">
+                        Here we analyze the mechanisms of the new imperialism. If navies conquered space, finance conquers time. This section visualizes how debt acts as a temporal extraction mechanism, forcing younger and unborn generations to surrender their future labor to maintain present-day economic stability for the elite.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    <div class="lg:col-span-5 flex flex-col justify-center">
+                        <h3 class="font-bold text-xl mb-4 text-indigo-900">The Mechanism of Debt</h3>
+                        <p class="mb-4 text-stone-600">
+                            By issuing massive amounts of debt (bonds), a society "spends" the labor of people who haven't been born yet. Modern financialization represents the extension of the commodity principle along the axis of time.
+                        </p>
+                        <blockquote class="pl-4 border-l-2 border-indigo-300 text-stone-500 italic mb-6 text-sm">
+                            "The future is being colonized so as to make it take the overspill of the pressures on organizations operating in the present." <br>— Photis Lysandrou
+                        </blockquote>
+                        <div class="space-y-4">
+                            <button id="btn-debt-trap" class="w-full text-left px-4 py-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors font-medium text-indigo-900 flex justify-between items-center">
+                                Explore the "Debt Trap"
+                                <span>+</span>
+                            </button>
+                            <div id="content-debt-trap" class="hidden p-4 text-sm text-stone-600 border border-indigo-100 rounded-lg">
+                                Just as physical colonies were forced into debt to their colonizers, modern youth are born into a "pre-colonized" state. They owe their productive lives to the interest on systemic debts they never voted for or signed for.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7 bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+                        <h4 class="text-center font-bold text-stone-700 mb-2">Estimated Intergenerational Debt Burden</h4>
+                        <div class="chart-container">
+                            <canvas id="temporalChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-stone-400 mt-4">Conceptual visualization: Economic burden inherited at age 30 across generations.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="culture" class="mb-32 fade-in">
+                <div class="mb-12 border-b border-stone-200 pb-8">
+                    <div class="text-4xl mb-4">🎸</div>
+                    <h2 class="serif text-3xl font-bold mb-4">3. "No Future": The Punk Prophecy & Climate Youth</h2>
+                    <p class="text-lg text-stone-600 leading-relaxed max-w-3xl">
+                        Culture often diagnoses systemic illness before economics does. This section maps the cultural reaction to temporal colonization, from the post-war social contract shredding in the 1970s to the modern climate crisis, framing ecological destruction as the ultimate theft from the future.
+                    </p>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 mb-8">
+                    <button class="culture-tab active flex-1 py-3 px-4 bg-stone-200 text-stone-800 font-bold rounded-t-lg md:rounded-l-lg md:rounded-tr-none transition-all" data-target="punk">
+                        1970s: The Punk Scouts
+                    </button>
+                    <button class="culture-tab flex-1 py-3 px-4 bg-stone-100 text-stone-500 hover:bg-stone-200 font-bold transition-all" data-target="climate">
+                        2020s: The Climate Movement
+                    </button>
+                    <button class="culture-tab flex-1 py-3 px-4 bg-stone-100 text-stone-500 hover:bg-stone-200 font-bold rounded-b-lg md:rounded-r-lg md:rounded-bl-none transition-all" data-target="music">
+                        The Soundtrack of Extraction
+                    </button>
+                </div>
+
+                <div id="punk" class="culture-content bg-white p-8 rounded-lg shadow-sm border border-stone-100 min-h-[250px]">
+                    <h3 class="text-2xl font-bold mb-4 serif">Johnny Rotten's Diagnosis</h3>
+                    <p class="text-stone-600 mb-4 text-lg">
+                        The 1970s punk movement was the first "scout" to return from the front lines of this new temporal war and tell us we were losing.
+                    </p>
+                    <p class="text-stone-600">
+                        When the Sex Pistols sang "No Future," they were diagnosing the reality that the post-war "social contract" had been shredded. The resources meant to build a future for their generation were actively being consumed by the elite to maintain the status quo during the 1970s stagflation crisis.
+                    </p>
+                </div>
+
+                <div id="climate" class="culture-content hidden bg-white p-8 rounded-lg shadow-sm border border-green-100 min-h-[250px]">
+                    <h3 class="text-2xl font-bold mb-4 serif text-green-800">Burning the Atmosphere of 2050</h3>
+                    <p class="text-stone-600 mb-4 text-lg">
+                        Today’s youth (Gen Z/Alpha) have replaced the safety pin with the protest sign.
+                    </p>
+                    <p class="text-stone-600">
+                        The climate crisis is the ultimate form of "resource extraction" from the future. We are literally burning the atmosphere and ecological stability of the year 2050 simply to keep the stock tickers green in the present decade. It is chronocolonization in its most physical, devastating form.
+                    </p>
+                </div>
+
+                <div id="music" class="culture-content hidden bg-white p-8 rounded-lg shadow-sm border border-stone-100 min-h-[250px]">
+                    <h3 class="text-2xl font-bold mb-6 serif">Anthems of the Occupied Future</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-xl mr-3">🎧</span>
+                            <div>
+                                <strong class="text-stone-800">Dead Kennedys – "Moon Over Marin"</strong>
+                                <p class="text-sm text-stone-500 mt-1">About ecological collapse and the wealthy escaping the mess they created.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl mr-3">🎧</span>
+                            <div>
+                                <strong class="text-stone-800">Enter Shikari – "Anaesthetist"</strong>
+                                <p class="text-sm text-stone-500 mt-1">Addressing the privatization of future health infrastructure for present profit.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl mr-3">🎧</span>
+                            <div>
+                                <strong class="text-stone-800">The 1975 – "The 1975" (Greta Thunberg version)</strong>
+                                <p class="text-sm text-stone-500 mt-1">A modern "No Future" anthem focused entirely on the urgency of the climate crisis.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="territory" class="mb-32 fade-in">
+                <div class="mb-12 border-b border-stone-200 pb-8">
+                    <div class="text-4xl mb-4">⚔️</div>
+                    <h2 class="serif text-3xl font-bold mb-4">4. The Return to Territory: Why War is Back</h2>
+                    <p class="text-lg text-stone-600 leading-relaxed max-w-3xl">
+                        The temporal fix is failing. This section examines the current geopolitical climate, arguing that aggressive territorial stances (e.g., conflicts over resources, proxy wars) are symptoms of a system that has exhausted its future borrowing capacity and is reverting to brute spatial extraction.
+                    </p>
+                </div>
+
+                <div class="bg-stone-900 text-stone-300 p-8 rounded-xl shadow-lg mb-8">
+                    <h3 class="text-2xl font-bold mb-4 text-white serif">A Crisis of the Temporal Fix</h3>
+                    <p class="mb-6 text-lg font-light">
+                        Elites seem to be moving back to aggressive territorial stances globally. This isn't a contradiction; it’s a symptom. When you have extracted so much from the future that the future starts to look like a barren desert, you are forced back into the "old ways."
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-center">
+                        <div class="p-4 bg-stone-800 rounded-lg">
+                            <div class="text-3xl mb-2">🛢️</div>
+                            <div class="font-bold text-white mb-1">Physical Land & Oil</div>
+                            <div class="text-xs text-stone-400">Re-securing traditional energy via force.</div>
+                        </div>
+                        <div class="p-4 bg-stone-800 rounded-lg">
+                            <div class="text-3xl mb-2">🔋</div>
+                            <div class="font-bold text-white mb-1">Lithium & Minerals</div>
+                            <div class="text-xs text-stone-400">The new spatial rush for tech components.</div>
+                        </div>
+                        <div class="p-4 bg-stone-800 rounded-lg">
+                            <div class="text-3xl mb-2">📉</div>
+                            <div class="font-bold text-white mb-1">Mark Fisher's 'Capitalist Realism'</div>
+                            <div class="text-xs text-stone-400">The imaginary future fails, returning us to the brute past.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-stone-800 p-4 rounded-lg">
+                        <div class="chart-container">
+                            <canvas id="crisisChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-stone-500 mt-4">Conceptual visualization: As temporal extraction (debt/climate capacity) maxes out, territorial conflicts rise.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conclusion" class="mb-24 fade-in bg-orange-50 p-8 md:p-12 rounded-2xl border border-orange-100">
+                <h2 class="serif text-3xl font-bold mb-6 text-orange-900">Synthesis: The Mental Health Toll</h2>
+                <p class="text-xl text-stone-800 leading-relaxed mb-6 font-light">
+                    The 1970s wasn't just a decade of bad hair and disco; it was the moment the elite realized they could treat their own children like a distant colony. They traded the physical conquest of the "Global South" for the temporal conquest of the "Global Future."
+                </p>
+                <p class="text-lg text-stone-700 leading-relaxed mb-8">
+                    Do you think this "temporal colonization" is why we see such a massive mental health crisis in today's youth? It may be a subconscious realization that they are living in an <strong>"occupied" future</strong>. Today's aggressive geopolitics are the symptoms of an empire that has run out of time to steal and is now fighting over the remaining physical scraps of the earth.
+                </p>
+
+                <div class="border-t border-orange-200 pt-8 mt-8">
+                    <h4 class="font-bold text-sm text-orange-800 uppercase tracking-wider mb-4">References & Further Reading</h4>
+                    <ul class="text-sm text-stone-600 space-y-2">
+                        <li><strong>Fisher, M. (2009).</strong> <em>Capitalist Realism: Is There No Alternative?</em> Zer0 Books.</li>
+                        <li><strong>Harvey, D. (2003).</strong> <em>The New Imperialism.</em> Oxford University Press.</li>
+                        <li><strong>Lysandrou, P. (2016).</strong> <em>The Colonization of the Future: An alternative view of financialization.</em> Journal of Post Keynesian Economics.</li>
+                        <li><strong>Klein, N. (2014).</strong> <em>This Changes Everything: Capitalism vs. The Climate.</em></li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        
+                        const id = entry.target.getAttribute('id');
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                            if(link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { threshold: 0.2, rootMargin: "-50px 0px -20% 0px" });
+
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+            const btnDebtTrap = document.getElementById('btn-debt-trap');
+            const contentDebtTrap = document.getElementById('content-debt-trap');
+            btnDebtTrap.addEventListener('click', () => {
+                contentDebtTrap.classList.toggle('hidden');
+                btnDebtTrap.querySelector('span').textContent = contentDebtTrap.classList.contains('hidden') ? '+' : '-';
+            });
+
+            const tabs = document.querySelectorAll('.culture-tab');
+            const contents = document.querySelectorAll('.culture-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.classList.remove('bg-stone-200', 'text-stone-800');
+                        t.classList.add('bg-stone-100', 'text-stone-500');
+                    });
+                    tab.classList.remove('bg-stone-100', 'text-stone-500');
+                    tab.classList.add('bg-stone-200', 'text-stone-800');
+                    
+                    contents.forEach(c => c.classList.add('hidden'));
+                    document.getElementById(tab.dataset.target).classList.remove('hidden');
+                });
+            });
+
+            const spatialCtx = document.getElementById('spatialChart').getContext('2d');
+            new Chart(spatialCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1850', '1900', '1950', '1980', '2000', '2020'],
+                    datasets: [
+                        {
+                            label: 'Available Uncolonized Markets',
+                            data: [100, 75, 30, 10, 5, 2],
+                            borderColor: '#c2410c',
+                            backgroundColor: 'rgba(194, 65, 12, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Capital Requirement for Expansion',
+                            data: [10, 25, 50, 75, 90, 100],
+                            borderColor: '#4338ca',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '% (Conceptual)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { display: false, min: 0, max: 110 },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            const temporalCtx = document.getElementById('temporalChart').getContext('2d');
+            new Chart(temporalCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Boomers', 'Gen X', 'Millennials', 'Gen Z', 'Gen Alpha'],
+                    datasets: [{
+                        label: 'Relative Inherited Debt/Ecological Burden Index',
+                        data: [15, 35, 75, 120, 180],
+                        backgroundColor: [
+                            'rgba(214, 211, 209, 0.6)', 
+                            'rgba(168, 162, 158, 0.8)', 
+                            'rgba(67, 56, 202, 0.7)',   
+                            'rgba(194, 65, 12, 0.8)',   
+                            'rgba(153, 27, 27, 0.9)'    
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { display: true, title: { display: true, text: 'Burden Index' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            Chart.defaults.color = '#a8a29e'; 
+            const crisisCtx = document.getElementById('crisisChart').getContext('2d');
+            new Chart(crisisCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1980', '1990', '2000', '2010', '2020', '2030 (Proj)'],
+                    datasets: [
+                        {
+                            label: 'Temporal Capacity (Future Credit)',
+                            data: [100, 80, 50, 20, 5, 0],
+                            borderColor: '#10b981', 
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Territorial Conflict Metrics',
+                            data: [20, 15, 10, 30, 70, 100],
+                            borderColor: '#ef4444', 
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#d6d3d1' } }
+                    },
+                    scales: {
+                        y: { display: false },
+                        x: { grid: { color: '#44403c' }, ticks: { color: '#d6d3d1' } }
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
