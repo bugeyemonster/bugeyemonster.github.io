@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warrior Dance Vinyasa Flow Yoga</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #f0f0f0;
+            --accent-color: #d4af37; /* Gold accent */
+            --secondary-text: #a0a0a0;
+            --btn-bg: #333;
+            --btn-hover: #555;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container & Screens */
+        .container {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        #intro-screen, #practice-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        #practice-screen {
+            display: none; /* Hidden until started */
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: var(--secondary-text);
+            font-style: italic;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--secondary-text);
+            margin-bottom: 30px;
+        }
+
+        /* Media Placeholder */
+        .media-placeholder {
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            background-color: #1e1e1e;
+            border: 2px dashed #444;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        /* Timer */
+        .timer-display {
+            font-size: 6rem;
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background-color: var(--btn-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            min-width: 120px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        #start-btn {
+            background-color: var(--accent-color);
+            color: #000;
+            font-size: 1.5rem;
+            padding: 20px 40px;
+        }
+
+        #start-btn:hover {
+            background-color: #b8962e;
+        }
+
+        /* Next Pose Indicator */
+        .up-next {
+            font-size: 1.1rem;
+            color: var(--secondary-text);
+            background-color: #1e1e1e;
+            padding: 15px 25px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="intro-screen">
+            <h1>Warrior Dance Vinyasa Flow</h1>
+            <h2>Target Session Time: 90 Minutes</h2>
+            <p>
+                Welcome to your Warrior Yoga Sequence. This web app will guide you through all 30 poses of the sequence. <br><br>
+                Standard poses are timed for 60 seconds (approx. 5 slow breaths). The system automatically inserts a 45-second <strong>Vinyasa Transition</strong> between major standing movements to allow you to deliberately move through Chaturanga, Upward Dog, and Downward Dog. <br><br>
+                Use the controls to Pause or Skip as needed.
+            </p>
+            <button id="start-btn" onclick="startPractice()">Begin Practice</button>
+        </div>
+
+        <div id="practice-screen">
+            
+            <div class="media-placeholder" id="media-container">
+                [ GIF / Image Placeholder ]
+            </div>
+
+            <h1 id="pose-name">Pose Name</h1>
+            <h2 id="sanskrit-name">Sanskrit Name</h2>
+
+            <div class="timer-display" id="timer">00:00</div>
+
+            <div class="controls">
+                <button id="pause-btn" onclick="togglePause()">Pause</button>
+                <button id="skip-btn" onclick="skipPose()">Skip</button>
+            </div>
+
+            <div class="up-next" id="up-next">
+                <strong>Up Next:</strong> <span id="next-pose-name">...</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA SEQUENCE ---
+        // You can add 'gif: "path.gif"' and 'audio: "path.wav"' to these objects later.
+        const sequence = [
+            // Phase 1: Grounding
+            { name: "Corpse", sanskrit: "Savasana", duration: 180 },
+            { name: "Mountain", sanskrit: "Tadasana", duration: 60 },
+            { name: "Shoulder Openers", sanskrit: "Paschima Namaskarasana", duration: 60 },
+            { name: "Swaying Palm", sanskrit: "Tiryaka Tadasana", duration: 60 },
+            { name: "Tip Toes", sanskrit: "Prapadasana", duration: 60 },
+            { name: "Mountain", sanskrit: "Tadasana", duration: 60 },
+            { name: "Big Toe to Gorilla", sanskrit: "Padangusthasana to Padahastasana", duration: 120 },
+            { name: "Hip Circles", sanskrit: "Kati Chakrasana", duration: 60 },
+            { name: "Ankle Rotations", sanskrit: "Goolf Chakra", duration: 60 },
+            { name: "Tree (Right & Left)", sanskrit: "Vrksasana", duration: 120 },
+            
+            // Phase 2: Heat
+            { name: "Sun Salutation A (x3)", sanskrit: "Surya Namaskar A", duration: 180 },
+            { name: "Sun Salutation B (x3)", sanskrit: "Surya Namaskar B", duration: 240 },
+            
+            // Phase 3: Warrior Dance (Right Side)
+            { name: "Warrior 1 (Right)", sanskrit: "Virabhadrasana I", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Warrior 2 (Right)", sanskrit: "Virabhadrasana II", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Warrior 3 (Right)", sanskrit: "Virabhadrasana III", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Triangle (Right)", sanskrit: "Trikonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Extended Side Angle (Right)", sanskrit: "Utthita Parsvakonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Revolved Triangle (Right)", sanskrit: "Parivritta Trikonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Revolved Side Angle (Right)", sanskrit: "Parivritta Parsvakonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Dragon (Right)", sanskrit: "Utthan Pristhasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Pigeon (Right)", sanskrit: "Eka Pada Rajakapotasana", duration: 120 },
+            { name: "Vinyasa Transition (Switch Sides)", sanskrit: "Chaturanga -> Down Dog", duration: 60 },
+
+            // Phase 3: Warrior Dance (Left Side)
+            { name: "Warrior 1 (Left)", sanskrit: "Virabhadrasana I", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Warrior 2 (Left)", sanskrit: "Virabhadrasana II", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Warrior 3 (Left)", sanskrit: "Virabhadrasana III", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Triangle (Left)", sanskrit: "Trikonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Extended Side Angle (Left)", sanskrit: "Utthita Parsvakonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Revolved Triangle (Left)", sanskrit: "Parivritta Trikonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Revolved Side Angle (Left)", sanskrit: "Parivritta Parsvakonasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Dragon (Left)", sanskrit: "Utthan Pristhasana", duration: 60 },
+            { name: "Vinyasa Transition", sanskrit: "Chaturanga -> Down Dog", duration: 45 },
+            { name: "Pigeon (Left)", sanskrit: "Eka Pada Rajakapotasana", duration: 120 },
+            { name: "Vinyasa Transition to Floor", sanskrit: "Chaturanga -> Down Dog -> Seat", duration: 60 },
+
+            // Phase 4: Seated & Vinyasa
+            { name: "Easy Pose", sanskrit: "Sukhasana", duration: 60 },
+            { name: "Easy Pose Twist (Left & Right)", sanskrit: "Parivritta Sukhasana", duration: 120 },
+            { name: "Seated Wide Leg Stretches A, B, C", sanskrit: "Upavistha Konasana", duration: 180 },
+            { name: "Seated Wide Leg Twist (Both Sides)", sanskrit: "Parivritta Upavistha Konasana", duration: 120 },
+            { name: "Greg’s Vinyasa & Wild Thing (R & L x5)", sanskrit: "Camatkarasana / Vasisthasana", duration: 300 },
+            
+            // Phase 5: Core & Inversions
+            { name: "Boat Pose (x5)", sanskrit: "Navasana", duration: 180 },
+            { name: "Bridge Pose (x3)", sanskrit: "Setu Bandha Sarvangasana", duration: 180 },
+            { name: "Plow", sanskrit: "Halasana", duration: 60 },
+            { name: "Shoulder Stand", sanskrit: "Salamba Sarvangasana", duration: 120 },
+            { name: "Fish", sanskrit: "Matsyasana", duration: 60 },
+            
+            // Phase 6: Closing
+            { name: "Bruce Lee Tension Release (x3)", sanskrit: "Nadi Shodhana Savasana", duration: 120 },
+            { name: "Final Corpse", sanskrit: "Savasana", duration: 300 }
+        ];
+
+        // --- APP LOGIC ---
+        let currentIndex = 0;
+        let timeLeft = 0;
+        let timerInterval = null;
+        let isPaused = false;
+
+        // DOM Elements
+        const introScreen = document.getElementById('intro-screen');
+        const practiceScreen = document.getElementById('practice-screen');
+        const poseNameEl = document.getElementById('pose-name');
+        const sanskritNameEl = document.getElementById('sanskrit-name');
+        const timerEl = document.getElementById('timer');
+        const upNextEl = document.getElementById('next-pose-name');
+        const pauseBtn = document.getElementById('pause-btn');
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startPractice() {
+            introScreen.style.display = 'none';
+            practiceScreen.style.display = 'flex';
+            loadPose(currentIndex);
+        }
+
+        function loadPose(index) {
+            if (index >= sequence.length) {
+                finishPractice();
+                return;
+            }
+
+            const currentPose = sequence[index];
+            poseNameEl.innerText = currentPose.name;
+            sanskritNameEl.innerText = currentPose.sanskrit;
+            
+            // Future asset loading hook:
+            // if(currentPose.audio) playAudio(currentPose.audio);
+            // if(currentPose.gif) updateImage(currentPose.gif);
+
+            timeLeft = currentPose.duration;
+            timerEl.innerText = formatTime(timeLeft);
+
+            // Update Up Next
+            if (index + 1 < sequence.length) {
+                upNextEl.innerText = `${sequence[index + 1].name} (${sequence[index + 1].sanskrit})`;
+            } else {
+                upNextEl.innerText = "Finish";
+            }
+
+            // Reset pause state and start timer
+            isPaused = false;
+            pauseBtn.innerText = "Pause";
+            clearInterval(timerInterval);
+            timerInterval = setInterval(tick, 1000);
+        }
+
+        function tick() {
+            if (isPaused) return;
+
+            timeLeft--;
+            timerEl.innerText = formatTime(timeLeft);
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                currentIndex++;
+                loadPose(currentIndex);
+            }
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseBtn.innerText = "Resume";
+            } else {
+                pauseBtn.innerText = "Pause";
+            }
+        }
+
+        function skipPose() {
+            clearInterval(timerInterval);
+            currentIndex++;
+            loadPose(currentIndex);
+        }
+
+        function finishPractice() {
+            clearInterval(timerInterval);
+            poseNameEl.innerText = "Namaste";
+            sanskritNameEl.innerText = "Practice Complete";
+            timerEl.innerText = "00:00";
+            document.querySelector('.controls').style.display = 'none';
+            document.getElementById('up-next').style.display = 'none';
+            document.getElementById('media-container').innerText = "Excellent Work.";
+        }
+
+    </script>
+</body>
+</html>
