@@ -6,14 +6,15 @@
     <title>Op Sec's Yin Yoga for Mindfulness</title>
     <style>
         :root {
-            --bg-color: #0f172a; /* Deep calm slate */
+            --bg-color: #0f172a;
             --text-color: #e2e8f0;
-            --accent-color: #a855f7; /* Calming purple */
+            --accent-color: #a855f7;
             --secondary-text: #94a3b8;
             --btn-bg: #1e293b;
             --btn-hover: #334155;
             --panel-bg: #1e293b;
-            --rebound-color: #38bdf8; /* Ethereal blue for rebounds */
+            --rebound-color: #38bdf8;
+            --warning-color: #ef4444;
         }
 
         body {
@@ -64,7 +65,7 @@
             background-color: var(--panel-bg);
             padding: 25px;
             border-radius: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: left;
             width: 100%;
             max-width: 500px;
@@ -77,11 +78,29 @@
             margin-top: 0;
         }
 
-        .equipment-list {
-            margin: 0;
-            padding-left: 20px;
-            color: var(--secondary-text);
+        .settings-panel {
+            background-color: var(--panel-bg);
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #334155;
+        }
+
+        .settings-panel label {
             font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
         }
 
         .media-placeholder {
@@ -173,15 +192,13 @@
             <h2>For Mindfulness Practice</h2>
             
             <div class="info-panel">
-                <p><strong>Session Overview:</strong> A dynamically generated 60-minute deep tissue practice. Features 10 randomly selected knee-safe asanas mapped to strict Yin counter-pose best practices.</p>
+                <p><strong>Session Overview:</strong> A dynamically generated 60-minute deep tissue practice mapping the full YinYoga.com asana library. Adheres to strict counter-pose principles.</p>
                 <p><strong>Breathing:</strong> Target 4 to 5 long, slow breaths per minute. Sink into the stillness.</p>
-                <p><strong>Required Props:</strong></p>
-                <ul class="equipment-list">
-                    <li>Yoga Mat</li>
-                    <li>2x Yoga Blocks</li>
-                    <li>1x Bolster (or heavy pillows)</li>
-                    <li>1x Blanket (for warmth during Savasana)</li>
-                </ul>
+            </div>
+
+            <div class="settings-panel">
+                <label for="no-knees-toggle"><strong>Exclude "Knee Crusher" Poses</strong><br><span style="font-size:0.9rem; color:var(--secondary-text);">Removes Saddle, Frog, Swan, Dragon, etc.</span></label>
+                <input type="checkbox" id="no-knees-toggle">
             </div>
 
             <button id="start-btn" onclick="startPractice()">Generate & Begin Session</button>
@@ -214,33 +231,50 @@
     </div>
 
     <script>
-        // --- YIN POSE POOLS (No Knee-Crushers) ---
+        // --- EXPANDED YIN POSE POOLS (with Knee Crusher Flags) ---
+        
+        // Asymmetrical Hip Openers (Slot 1)
         const asymHips = [
-            {base: "Eye of the Needle", sanskrit: "Sucirandhrasana", focus: "Outer hips, glutes (Keep spine completely flat)"},
-            {base: "Shoelace", sanskrit: "Gomukhasana Legs", focus: "Outer hips, IT band (Sit elevated on a block)"},
-            {base: "Square Pose", sanskrit: "Agnistambhasana", focus: "Deep external hip rotation (Prop floating knees with blocks)"}
+            {base: "Dragon", sanskrit: "Utthan Pristhasana", focus: "Hip flexors, deep groin (Modify if knee is sensitive)", isKnee: true},
+            {base: "Swan", sanskrit: "Eka Pada Rajakapotasana", focus: "Outer hip, glutes, hip flexors", isKnee: true},
+            {base: "Deer", sanskrit: "Mrigasana", focus: "Internal/external hip rotation", isKnee: true},
+            {base: "Shoelace", sanskrit: "Gomukhasana Legs", focus: "Outer hips, IT band (Sit elevated on a block)", isKnee: false},
+            {base: "Square", sanskrit: "Agnistambhasana", focus: "Deep external hip rotation (Prop floating knees)", isKnee: false},
+            {base: "Half Butterfly", sanskrit: "Ardha Baddha Konasana", focus: "Hamstrings, lower back, inner thigh", isKnee: false},
+            {base: "Eye of the Needle", sanskrit: "Sucirandhrasana", focus: "Outer hips, glutes (Supine, spine flat)", isKnee: false}
         ];
         
+        // Symmetrical Folds & Hips (Slots 2 & 5)
         const symFolds = [
-            {name: "Butterfly", sanskrit: "Baddha Konasana", focus: "Inner thighs, lower back (Allow the spine to gently round)"},
-            {name: "Caterpillar", sanskrit: "Paschimottanasana", focus: "Hamstrings, entire spine (Let the head hang heavy)"},
-            {name: "Dragonfly / Straddle", sanskrit: "Upavistha Konasana", focus: "Inner groins, back of legs (Fold from the hips, prop chest)"}
+            {name: "Butterfly", sanskrit: "Baddha Konasana", focus: "Inner thighs, lower back (Allow spine to gently round)", isKnee: false},
+            {name: "Caterpillar", sanskrit: "Paschimottanasana", focus: "Hamstrings, entire spine (Let head hang heavy)", isKnee: false},
+            {name: "Dragonfly / Straddle", sanskrit: "Upavistha Konasana", focus: "Inner groins, back of legs", isKnee: false},
+            {name: "Dangling", sanskrit: "Baddha Hasta Uttanasana", focus: "Hamstrings, lower back decompression (Standing fold)", isKnee: false},
+            {name: "Frog", sanskrit: "Mandukasana", focus: "Deep inner groin, adductors", isKnee: true},
+            {name: "Squat", sanskrit: "Malasana", focus: "Hips, ankles, lower back", isKnee: true}
         ];
         
+        // Backbends (Slots 3 & 6)
         const symBackbends = [
-            {name: "Sphinx", sanskrit: "Salamba Bhujangasana", focus: "Lower back compression (Completely relax the glutes)"},
-            {name: "Supported Bridge", sanskrit: "Setu Bandhasana", focus: "Sacrum decompression (Rest heavy on the block under sacrum)"},
-            {name: "Seal Pose", sanskrit: "Bhujangasana variant", focus: "Deep lower back compression (Hands wide, arms straight)"}
+            {name: "Sphinx", sanskrit: "Salamba Bhujangasana", focus: "Lower back compression (Completely relax the glutes)", isKnee: false},
+            {name: "Seal Pose", sanskrit: "Bhujangasana variant", focus: "Deep lower back compression (Hands wide, arms straight)", isKnee: false},
+            {name: "Supported Bridge", sanskrit: "Setu Bandhasana", focus: "Sacrum decompression (Rest heavy on the block)", isKnee: false},
+            {name: "Saddle", sanskrit: "Supta Virasana", focus: "Quads, hip flexors, lumbar spine (Deep knee flexion)", isKnee: true},
+            {name: "Camel", sanskrit: "Ustrasana", focus: "Heart opener, hip flexors", isKnee: true},
+            {name: "Melting Heart", sanskrit: "Anahatasana", focus: "Upper back, shoulders, thoracic spine", isKnee: true}
         ];
         
+        // Asymmetrical Sides (Slot 4)
         const asymSides = [
-            {base: "Bananasana", sanskrit: "Supine Side Bend", focus: "Obliques, IT band (Keep both hips grounded securely)"},
-            {base: "Half Happy Baby", sanskrit: "Ardha Ananda Balasana", focus: "Inner groin, hip flexor (Keep the opposite leg straight)"}
+            {base: "Bananasana", sanskrit: "Supine Side Bend", focus: "Obliques, IT band (Keep both hips grounded securely)", isKnee: false},
+            {base: "Cat Pulling Its Tail", sanskrit: "Supta Udarakarshanasana", focus: "Quads, mild twist, side body", isKnee: false},
+            {base: "Half Happy Baby", sanskrit: "Ardha Ananda Balasana", focus: "Inner groin, hip flexor (Keep opposite leg straight)", isKnee: false}
         ];
         
+        // Asymmetrical Twists (Slot 7)
         const asymTwists = [
-            {base: "Reclining Spinal Twist", sanskrit: "Supta Matsyendrasana", focus: "Spinal mobility (Breathe deep into the belly)"},
-            {base: "Twisted Roots", sanskrit: "Eagle Legs Twist", focus: "Deep spinal rotation, outer hips (Let gravity do the work)"}
+            {base: "Reclining Spinal Twist", sanskrit: "Supta Matsyendrasana", focus: "Spinal mobility (Breathe deep into the belly)", isKnee: false},
+            {base: "Twisted Roots", sanskrit: "Eagle Legs Twist", focus: "Deep spinal rotation, outer hips", isKnee: false}
         ];
 
         let sequence = [];
@@ -259,45 +293,46 @@
         const upNextEl = document.getElementById('next-pose-name');
         const pauseBtn = document.getElementById('pause-btn');
 
-        // Helper: Randomizer
-        function getRandom(arr, n) {
-            let shuffled = [...arr].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, n);
+        // Helper: Randomizer & Filter
+        function getPoses(pool, count, excludeKnees) {
+            let filteredPool = excludeKnees ? pool.filter(pose => !pose.isKnee) : pool;
+            let shuffled = [...filteredPool].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
         }
 
         // --- SEQUENCE GENERATOR ALGORITHM ---
-        function generateSequence() {
+        function generateSequence(excludeKnees) {
             let seq = [];
 
             // 1. Opening Savasana (5 mins)
             seq.push({ name: "Opening Corpse Pose", sanskrit: "Savasana", duration: 300, focus: "Settle the nervous system and arrive on the mat.", isRebound: false });
 
-            // Randomly select poses for this session
-            const selectedHips = getRandom(asymHips, 1)[0];
-            const selectedFolds = getRandom(symFolds, 2);
-            const selectedBackbends = getRandom(symBackbends, 2);
-            const selectedSides = getRandom(asymSides, 1)[0];
-            const selectedTwists = getRandom(asymTwists, 1)[0];
+            // Randomly select poses based on user preference
+            const selectedHips = getPoses(asymHips, 1, excludeKnees)[0];
+            const selectedFolds = getPoses(symFolds, 2, excludeKnees);
+            const selectedBackbends = getPoses(symBackbends, 2, excludeKnees);
+            const selectedSides = getPoses(asymSides, 1, excludeKnees)[0];
+            const selectedTwists = getPoses(asymTwists, 1, excludeKnees)[0];
 
-            // Helper to build Left/Right blocks with Rebounds (4 mins each + 1 min Rebound)
+            // Helper to build Left/Right blocks with Rebounds
             const buildAsym = (pose) => {
                 return [
                     { name: `${pose.base} (Left Side)`, sanskrit: pose.sanskrit, duration: 240, focus: pose.focus, isRebound: false },
-                    { name: "Rebound", sanskrit: "Mini Savasana / Pentacle", duration: 60, focus: "Lie flat. Feel the energetic echo (Chi flow) on the left side.", isRebound: true },
+                    { name: "Rebound", sanskrit: "Mini Savasana / Pentacle", duration: 60, focus: "Lie flat. Feel the energetic echo on the left side.", isRebound: true },
                     { name: `${pose.base} (Right Side)`, sanskrit: pose.sanskrit, duration: 240, focus: pose.focus, isRebound: false },
-                    { name: "Rebound", sanskrit: "Mini Savasana / Pentacle", duration: 60, focus: "Lie flat. Observe the balance of energy returning to both sides.", isRebound: true }
+                    { name: "Rebound", sanskrit: "Mini Savasana / Pentacle", duration: 60, focus: "Lie flat. Observe the balance of energy returning.", isRebound: true }
                 ];
             };
 
-            // Helper to build Symmetrical blocks with Rebounds (4 mins + 1 min Rebound)
+            // Helper to build Symmetrical blocks with Rebounds
             const buildSym = (pose) => {
                 return [
                     { name: pose.name, sanskrit: pose.sanskrit, duration: 240, focus: pose.focus, isRebound: false },
-                    { name: "Rebound", sanskrit: "Mini Savasana / Pentacle", duration: 60, focus: "Lie flat. Observe the physical and emotional shifts from the pose.", isRebound: true }
+                    { name: "Rebound", sanskrit: "Mini Savasana / Pentacle", duration: 60, focus: "Lie flat. Observe the physical and emotional shifts.", isRebound: true }
                 ];
             };
 
-            // 2. Assemble the 10 core working poses
+            // 2. Assemble the active sequence
             seq.push(...buildAsym(selectedHips));            // Slots 1 & 2
             seq.push(...buildSym(selectedFolds[0]));         // Slot 3
             seq.push(...buildSym(selectedBackbends[0]));     // Slot 4 (Counter to 3)
@@ -305,12 +340,12 @@
             seq.push(...buildSym(selectedFolds[1]));         // Slot 7
             seq.push(...buildSym(selectedBackbends[1]));     // Slot 8 (Counter to 7)
             
-            // Slots 9 & 10: Twists (Remove the very last rebound since Closing Savasana follows immediately)
+            // Slots 9 & 10: Twists (Remove the very last rebound)
             let twists = buildAsym(selectedTwists);
             twists.pop(); 
             seq.push(...twists);
 
-            // 3. Closing Savasana (6 mins to round total to exactly 60:00)
+            // 3. Closing Savasana (6 mins to equal 60:00 total)
             seq.push({ name: "Final Corpse Pose", sanskrit: "Savasana", duration: 360, focus: "Total surrender and integration. Let the practice soak in.", isRebound: false });
 
             return seq;
@@ -323,7 +358,9 @@
         }
 
         function startPractice() {
-            sequence = generateSequence();
+            const excludeKnees = document.getElementById('no-knees-toggle').checked;
+            sequence = generateSequence(excludeKnees);
+            
             introScreen.style.display = 'none';
             practiceScreen.style.display = 'flex';
             loadPose(currentIndex);
@@ -340,7 +377,6 @@
             sanskritNameEl.innerText = currentPose.sanskrit;
             focusTextEl.innerText = currentPose.focus;
             
-            // Visual cue for Rebound period
             if (currentPose.isRebound) {
                 timerEl.style.color = "var(--rebound-color)";
                 poseNameEl.style.color = "var(--rebound-color)";
@@ -352,7 +388,6 @@
             timeLeft = currentPose.duration;
             timerEl.innerText = formatTime(timeLeft);
 
-            // Update Up Next
             if (index + 1 < sequence.length) {
                 const nextPose = sequence[index + 1];
                 upNextEl.innerText = `${nextPose.name} (${nextPose.sanskrit})`;
