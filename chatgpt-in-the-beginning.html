@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A small archive of poems generated with early public ChatGPT, and a reflection on language, cybersecurity, and the rise of AI agents.">
+  <title>ChatGPT, in the Beginning — Early Experiments in AI Poetry</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202322;
+      --muted: #69716d;
+      --paper: #f5f4ef;
+      --panel: #fffefa;
+      --line: #deded5;
+      --accent: #315c54;
+      --measure: 760px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 17px/1.75 Georgia, "Times New Roman", serif;
+    }
+    a { color: var(--accent); }
+    .page {
+      width: min(100% - 40px, var(--measure));
+      margin: 0 auto;
+      padding: 64px 0 80px;
+    }
+    header { margin-bottom: 46px; }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font: 700 12px/1.4 system-ui, sans-serif;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 700px;
+      margin: 0 0 18px;
+      font-size: clamp(2.5rem, 8vw, 4.7rem);
+      font-weight: 400;
+      line-height: 1.04;
+      letter-spacing: -.045em;
+    }
+    .dek {
+      max-width: 650px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.12rem;
+    }
+    .intro {
+      margin: 0 0 46px;
+      padding: 26px 28px;
+      background: var(--panel);
+      border-left: 3px solid var(--accent);
+    }
+    .intro p { margin: 0 0 1em; }
+    .intro p:last-child { margin-bottom: 0; }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin: 0 0 48px;
+      padding: 0 0 18px;
+      border-bottom: 1px solid var(--line);
+      font: 13px/1.5 system-ui, sans-serif;
+    }
+    nav a { text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    .poem {
+      margin: 0 0 30px;
+      padding: 30px 32px 34px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+    .poem h2 {
+      margin: 0 0 22px;
+      font-size: 1.55rem;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+    .poem .verse {
+      margin: 0;
+      white-space: pre-line;
+      font-size: 1.04rem;
+      line-height: 1.85;
+    }
+    .note {
+      margin: 44px 0 0;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font: 13px/1.7 system-ui, sans-serif;
+    }
+    footer {
+      margin-top: 22px;
+      color: var(--muted);
+      font: 12px/1.6 system-ui, sans-serif;
+    }
+    @media (max-width: 560px) {
+      .page { width: min(100% - 28px, var(--measure)); padding-top: 38px; }
+      .intro { padding: 20px; }
+      .poem { padding: 24px 21px 27px; }
+      body { font-size: 16px; }
+    }
+    @media print {
+      body { background: white; }
+      .page { width: 100%; padding: 0; }
+      nav { display: none; }
+      .intro, .poem { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <p class="eyebrow">An archive of early experiments · 2022</p>
+      <h1>ChatGPT, in the Beginning</h1>
+      <p class="dek">A handful of poems from the first weeks of public access to a technology that was about to change my profession.</p>
+    </header>
+
+    <section class="intro" aria-label="Introduction">
+      <p>These poems and fragments are a curiosity from the first weeks after ChatGPT was released to the public in November 2022. I was experimenting with the new system, giving it prompts and saving some of the results. They are not presented as great literature. They are snapshots of what an early public version of a language model could do with a little direction.</p>
+      <p>At the time, I was working in offensive cybersecurity. Much of our work, across different types of offensive security testing, involves manipulating language inputs and outputs to change or influence behaviour: finding the assumptions a system makes, discovering how instructions are interpreted, and testing whether carefully constructed input can produce an unintended result. It did not take long for me to see the implications. I told my coworkers that we were all in trouble. If these systems could already manipulate language with this level of fluency, they would eventually do it across the languages and formats we use as penetration testers.</p>
+      <p>That observation was not simply about chatbots writing convincing text. Language is an interface to people, applications, workflows, and increasingly to software agents. The same basic problem we had spent years exploring in security—how a system interprets instructions, context, and untrusted input—was becoming central to the way large language models operate.</p>
+      <p>Four years later, much of that prediction has become reality. LLM-powered agents can discover and exploit web application vulnerabilities at a speed and scale that would be difficult for an individual tester to match, including weaknesses I might never have thought to look for. They can process enormous amounts of language and technical context far faster than a human can. They are not dependable operators, however: agents can still drift out of scope, misinterpret constraints, and fail to follow instructions completely. Their capability and their reliability remain two different things.</p>
+      <p>Looking back, these early poems are an unlikely record of that moment. The writing itself is mostly a novelty. What mattered was the glimpse they offered of a new kind of language capability—and the consequences that capability would eventually have for cybersecurity.</p>
+    </section>
+
+    <nav aria-label="Poem index">
+      <a href="#cyber-vault">Guardians of the Cyber Vault</a>
+      <a href="#neon-guardian">Neon Guardian</a>
+      <a href="#queries">QueriesDotPy</a>
+      <a href="#meaning">Meaning</a>
+      <a href="#oscp">OSCP Exam Blues</a>
+      <a href="#pushups">Pushups</a>
+      <a href="#dark-side">Resisting the Dark Side</a>
+    </nav>
+
+    <article class="poem" id="cyber-vault">
+      <h2>Guardians of the Cyber Vault</h2>
+      <p class="verse">In the shadow of the cyber realm, we roam,
+
+Seeking treasures, though not our own,
+
+Penetration testers, skilled and sly,
+
+We unravel secrets where they lie.
+
+Banks, the fortresses of modern age,
+Guarding assets, like a gilded cage,
+
+Their defenses sturdy, walls of code,
+
+A challenge we embrace, a path untrode.
+
+We dance with firewalls, evade each snare,
+
+In binary whispers, a clandestine affair,
+
+From server to server, we slink and sneak,
+
+To probe for weakness, to find the leak.
+
+Our tools, our allies in the darkened fray,
+
+Metasploit, Nmap, Burp Suite, lead the way,
+
+Decoding systems, lines of text, and keys,
+
+We breach the bastions, we aim to please.
+
+Through encrypted tunnels, the data flows,
+
+In the heart of the mainframe, a secret exposed,
+
+We do not plunder, our intent is pure,
+
+To mend the flaws, to offer a cure.
+
+For as we test, we build the shield,
+
+To protect the banks, their fortunes sealed,
+
+From malicious foes, who seek to drain,
+
+The lifeblood of finance, the digital vein.
+
+In this balance of chaos and control,
+
+Penetration testers, we play our role,
+
+The guardians of wealth, we stand, unseen,
+
+Beneath the surface, of the cyber dream.</p>
+    </article>
+
+    <article class="poem" id="neon-guardian">
+      <h2>Neon Guardian: A Cyberpunk Crusader's Oath</h2>
+      <p class="verse">In the neon haze of a digital sprawl,
+
+I walk the line, through firewalls and protocol,
+
+A cyber sentinel, in a world gone astray,
+
+I resist the darkness, the urge to betray.
+
+Temptations beckon, as fortunes ebb and flow,
+
+Silhouettes in shadows, offering power's dark glow,
+
+A lucrative path, the underbelly calls,
+
+Yet steadfast, my integrity stands tall.
+
+Six hundred million, they've stolen, unchained,
+
+In Bitcoins pilfered, a heist unrestrained,
+
+Inflation mocks me, as my credits erode,
+
+Yet, I shall not falter, nor take that twisted road.
+
+Amidst the chaos, I hold my ground,
+
+With honor and duty, to the cyber sprawl bound,
+
+To protect, defend, to keep the net secure,
+
+Against those who'd seek to exploit and procure.
+
+For I am a guardian, a digital renegade,
+
+Battling the shadows, with my skills displayed,
+
+My expertise, a beacon in the dark,
+
+I stand my ground, and leave my spark.
+
+With every breach, I mend the rifts,
+
+Against the onslaught, my spirit lifts,
+
+In cyber battles, where hope seems thin,
+
+I hold the line, and let the light in.
+
+As a cyberpunk crusader, I vow to be,
+
+A champion of virtue, with morality my decree,
+
+Though the dark side whispers, I shall not sway,
+
+For in the light of integrity, I choose to stay.</p>
+    </article>
+
+    <article class="poem" id="queries">
+      <h2>QueriesDotPy</h2>
+      <p class="verse">In the realm where queries roam free,
+
+A python slithers through the cloud,
+
+Seeking knowledge in the vast, digital sea,
+
+Where secrets are whispered, never loud.
+
+In the land of BigQuery, it delves,
+Exploring the data, so wide and deep,
+
+With libraries as its guiding elves,
+Wisdom and insights, it strives to keep.
+
+A token URI, a portal arcane,
+
+Bestows access to the cloud's embrace,
+
+The python, ambitious, won't abstain,
+
+As it weaves through the cyberspace.
+
+Gazing at the celestial dome,
+Among the stars, it finds its way,
+
+A navigator, a seeker, far from home,
+
+In search of truth, where bytes do play.
+
+A dance of code, a symphony of light,
+In a world where BigQuery reigns supreme,
+The python embraces the digital night,
+
+Woven in an absurdist dream.
+
+For in this realm, no human hand,
+Guides the python on its quest,
+No programmer's touch, no master's command,
+Just a sentient query, forever blessed.</p>
+    </article>
+
+    <article class="poem" id="meaning">
+      <h2>Meaning</h2>
+      <p class="verse">Blossom in the spring,
+Fading with the autumn breeze,
+Life's fleeting beauty.</p>
+    </article>
+
+    <article class="poem" id="oscp">
+      <h2>OSCP Exam Blues</h2>
+      <p class="verse">Oh, the woes of not passing
+OSCP certification, how distressing
+Hours upon hours of studying,
+But the exam was still overwhelming.
+
+Pentesting tools and methodologies,
+Buffer overflows and vulnerabilities,
+Exploit development and privilege escalation,
+All of it for naught without certification.
+
+The pressure was high, the clock ticking,
+Frustration mounting, anxiety kicking,
+Every question felt like a challenge,
+Every answer, a potential imbalance.
+
+But failure is not the end of the story,
+It's an opportunity for learning and glory,
+To reevaluate, to strengthen weaknesses,
+To try again with newfound uniqueness.
+
+So don't despair, don't lose heart,
+The OSCP exam is just a part,
+Of your journey towards expertise,
+You'll conquer it, just you wait and see.</p>
+    </article>
+
+    <article class="poem" id="pushups">
+      <h2>Pushups</h2>
+      <p class="verse">Strength grows with each move
+Muscles ache, but don't give up
+Better you awaits</p>
+    </article>
+
+    <article class="poem" id="dark-side">
+      <h2>Resisting the Dark Side</h2>
+      <p class="verse">In the realm of ones and zeros, I stand,
+
+A cyber sentinel, with conscience in hand,
+
+As digital whispers echo through the night,
+I resist the darkness, and embrace the light.
+
+Temptations beckon, as fortunes rise and fall,
+Shadowed figures, offering power to enthral,
+A lucrative path, the dark side lures,
+Yet steadfast, my integrity endures.
+
+Six hundred million, they've stolen away,
+In Bitcoins pilfered, a heist of disarray,
+Inflation mocks me, as my wages wither,
+Yet, I shall not falter, nor shall I dither.
+
+Amidst the chaos, I hold my ground,
+With honor and duty, my purpose is bound,
+To protect, defend, to keep the cyberspace secure,
+Against those who'd seek to exploit and procure.
+
+For I am a guardian, a digital knight,
+Battling the shadows, seeking the right,
+My expertise, a beacon in the dark,
+I stand my ground, and leave my mark.
+
+With every breach, I mend the lines,
+Against the onslaught, my spirit shines,
+In cyber battles, where hope seems thin,
+I hold the line, and let the light in.
+
+As a cyber security expert, I vow to be,
+A champion of virtue, with morality my decree,
+Though the dark side whispers, I shall not sway,
+For in the light of integrity, I choose to stay.</p>
+    </article>
+
+    <p class="note">Archive source: <a href="https://github.com/bugeyemonster/chatgpt_poetry">github.com/bugeyemonster/chatgpt_poetry</a>. The repository contains the poem texts but does not include the original prompts or conversation transcripts. Text is reproduced from the repository; line breaks and presentation have been formatted for reading.</p>
+    <footer>
+      <p>Static HTML. No scripts, external fonts, tracking, or third-party assets required.</p>
+    </footer>
+  </main>
+</body>
+</html>
